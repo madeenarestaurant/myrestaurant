@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://madeenaapi.adwaithh.online/api',
+  baseURL: 'http://localhost:5001/api',
+  // baseURL: 'https://madeenaapi.adwaithh.online/api',
   headers: {
     'Content-Type': 'application/json',
   },
