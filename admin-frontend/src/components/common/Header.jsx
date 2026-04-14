@@ -44,20 +44,6 @@ const Header = () => {
             </div>
         </div>
       </div>
-
-      {/* Search Bar - Stylized as in Image */}
-      <div className="relative group w-full">
-        <div className="absolute inset-0 bg-gray-100 rounded-2xl transition-all group-focus-within:bg-gray-200/50" />
-        <FiSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-        <input 
-            type="text" 
-            placeholder="Search" 
-            className="relative w-full bg-transparent border-none py-3.5 pl-14 pr-14 text-sm font-bold text-gray-800 outline-none placeholder:text-gray-300"
-        />
-        <button className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-300 hover:text-primary-500 transition-colors">
-            <FiMic size={20} />
-        </button>
-      </div>
     </header>
   );
 };

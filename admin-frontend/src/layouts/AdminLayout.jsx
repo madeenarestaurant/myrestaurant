@@ -5,7 +5,6 @@ import Header from '../components/common/Header';
 import Dashboard from '../pages/Dashboard';
 import Orders from '../pages/Orders';
 import Products from '../pages/Products';
-import Categories from '../pages/Categories';
 import Reservations from '../pages/Reservations';
 import Settings from '../pages/Settings';
 import useAdminStore from '../store/useAdminStore';
@@ -19,7 +18,6 @@ const AdminLayout = () => {
       case 'dashboard': return <Dashboard />;
       case 'orders': return <Orders />;
       case 'products': return <Products />;
-      case 'category': return <Categories />;
       case 'reservations': return <Reservations />;
       case 'settings': return <Settings />;
       default: return <Dashboard />;

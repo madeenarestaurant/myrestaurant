@@ -1,4 +1,5 @@
 const Category = require('../models/Category');
+const { generateSignedUrl } = require('../utils/s3Utils');
 
 exports.createCategory = async (req, res) => {
     try {
@@ -7,8 +8,13 @@ exports.createCategory = async (req, res) => {
 
         const newCategory = new Category({ name, description, status, img });
         await newCategory.save();
-        res.status(201).json(newCategory);
+        
+        const obj = newCategory.toObject();
+        obj.img = await generateSignedUrl(obj.img);
+        
+        res.status(201).json(obj);
     } catch (err) {
+        console.error('Error in createCategory:', err);
         res.status(500).json({ message: err.message });
     }
 };
@@ -16,7 +22,14 @@ exports.createCategory = async (req, res) => {
 exports.getCategories = async (req, res) => {
     try {
         const categories = await Category.find();
-        res.json(categories);
+        
+        const categoriesWithSignedUrls = await Promise.all(categories.map(async (c) => {
+            const obj = c.toObject();
+            obj.img = await generateSignedUrl(obj.img);
+            return obj;
+        }));
+        
+        res.json(categoriesWithSignedUrls);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -26,7 +39,11 @@ exports.getCategoryById = async (req, res) => {
     try {
         const category = await Category.findById(req.params.id);
         if (!category) return res.status(404).json({ message: 'Category not found' });
-        res.json(category);
+        
+        const obj = category.toObject();
+        obj.img = await generateSignedUrl(obj.img);
+        
+        res.json(obj);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -40,7 +57,11 @@ exports.updateCategory = async (req, res) => {
         }
         const category = await Category.findByIdAndUpdate(req.params.id, updates, { new: true });
         if (!category) return res.status(404).json({ message: 'Category not found' });
-        res.json(category);
+        
+        const obj = category.toObject();
+        obj.img = await generateSignedUrl(obj.img);
+        
+        res.json(obj);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

@@ -16,11 +16,13 @@ const upload = multer({
     storage: multerS3({
         s3: s3,
         bucket: process.env.AWS_BUCKET_NAME,
+        contentType: multerS3.AUTO_CONTENT_TYPE,
         metadata: function (req, file, cb) {
             cb(null, { fieldName: file.fieldname });
         },
         key: function (req, file, cb) {
-            const fileName = `${process.env.AWS_BUCKET_FOLDER}/${Date.now().toString()}-${file.originalname}`;
+            const cleanName = file.originalname.replace(/\s+/g, "-");
+            const fileName = `${process.env.AWS_BUCKET_FOLDER}/${Date.now().toString()}-${cleanName}`;
             cb(null, fileName);
         }
     }),

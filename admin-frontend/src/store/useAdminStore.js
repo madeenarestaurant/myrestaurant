@@ -116,6 +116,32 @@ const useAdminStore = create((set, get) => ({
     }
   },
 
+  updateProduct: async (id, data) => {
+    try {
+        await axiosInstance.put(`/products/${id}`, data, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        get().fetchStats();
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating product:', error);
+        return { success: false, error: error.response?.data?.message };
+    }
+  },
+
+  createProduct: async (data) => {
+    try {
+        await axiosInstance.post('/products', data, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        get().fetchStats();
+        return { success: true };
+    } catch (error) {
+        console.error('Error creating product:', error);
+        return { success: false, error: error.response?.data?.message };
+    }
+  },
+
   deleteCategory: async (id) => {
     try {
         await axiosInstance.delete(`/categories/${id}`);
@@ -123,7 +149,34 @@ const useAdminStore = create((set, get) => ({
     } catch (error) {
         console.error('Error deleting category:', error);
     }
+  },
+
+  updateCategory: async (id, data) => {
+    try {
+        await axiosInstance.put(`/categories/${id}`, data, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        get().fetchStats();
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating category:', error);
+        return { success: false, error: error.response?.data?.message };
+    }
+  },
+
+  createCategory: async (data) => {
+    try {
+        await axiosInstance.post('/categories', data, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        get().fetchStats();
+        return { success: true };
+    } catch (error) {
+        console.error('Error creating category:', error);
+        return { success: false, error: error.response?.data?.message };
+    }
   }
+
 }));
 
 export default useAdminStore;

@@ -22,7 +22,7 @@ const Sidebar = () => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: FiGrid },
     { id: 'orders', label: 'Order', icon: FiBox },
-    { id: 'reservations', label: 'Payment', icon: FiCreditCard },
+    { id: 'reservations', label: 'Reservation', icon: FiCreditCard },
     { id: 'products', label: 'Items', icon: FiLayers },
     { id: 'settings', label: 'Settings', icon: FiSettings },
   ];
