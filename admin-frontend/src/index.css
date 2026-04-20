@@ -67,4 +67,12 @@ body {
   .custom-scrollbar::-webkit-scrollbar-thumb {
     @apply bg-gray-200 dark:bg-gray-800 rounded-full hover:bg-primary-400 transition-colors;
   }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }

@@ -1,10 +1,17 @@
 const mongoose = require('mongoose');
 
 const OrderSchema = new mongoose.Schema({
-    customerName: { type: String, required: true },
-    email: { type: String, required: true },
-    phone: { type: String, required: true },
-    address: { type: String },
+    customerName: { type: String }, // Optional for dine-in
+    email: { type: String },
+    phone: { type: String },
+    addressDetails: {
+        city: String,
+        place: String,
+        pincode: String,
+        street: String,
+        nearby: String
+    },
+    address: { type: String }, // Consolidated address string
     items: [{
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
         quantity: { type: Number, default: 1 },
@@ -14,9 +21,23 @@ const OrderSchema = new mongoose.Schema({
     status: { 
         type: String, 
         enum: ['pending', 'confirmed', 'delivered', 'requested', 'cancelled'], 
-        default: 'pending' 
+        default: 'requested' 
     },
-    paymentStatus: { type: String, default: 'unpaid' },
+    mode: {
+        type: String,
+        enum: ['dine-in', 'take-away', 'delivery'],
+        default: "dine-in"
+    },
+    paymentStatus: { 
+        type: String,
+        enum: ['Pending', 'Completed', 'Failed'],
+        default: 'Pending' 
+    },
+    paymentMethod: {
+        type: String,
+        enum: ['COD', 'UPI', 'Card'],
+        default: 'COD'
+    },
     note: { type: String },
     createdDate: { type: Date, default: Date.now }
 }, { timestamps: true });

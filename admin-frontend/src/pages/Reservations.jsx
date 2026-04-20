@@ -1,165 +1,307 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../api/axiosInstance';
-import { FiCalendar, FiCheck, FiX, FiInfo, FiPhone, FiMail, FiLoader, FiClock } from 'react-icons/fi';
+import useAdminStore from '../store/useAdminStore';
+
+import { 
+    FiChevronLeft, 
+    FiBell, 
+    FiUser, 
+    FiPlus, 
+    FiChevronDown, 
+    FiChevronUp, 
+    FiCheck, 
+    FiX,
+    FiMessageSquare,
+    FiLoader
+} from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import Toast from '../components/common/Toast';
 import { clsx } from 'clsx';
 
 const Reservations = () => {
-  const [reservations, setReservations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('All');
+  const { reservations, fetchStats, loading, stats } = useAdminStore();
+  const [filter, setFilter] = useState('Active');
   const [toast, setToast] = useState({ message: '', type: 'success' });
-  const [actionLoading, setActionLoading] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
+  const [modalData, setModalData] = useState(null); // { id, type }
+  const [message, setMessage] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
-    fetchReservations();
+    fetchStats();
   }, []);
 
-  const fetchReservations = async () => {
-    try {
-      const response = await axiosInstance.get('/reservations');
-      setReservations(response.data);
-      setLoading(false);
-    } catch (error) {
-      setToast({ message: 'Failed to load reservations', type: 'error' });
-      setLoading(false);
-    }
-  };
 
-  const handleStatusUpdate = async (id, status) => {
-    setActionLoading(id);
+  const handleStatusUpdate = async () => {
+    if (!modalData) return;
+    setActionLoading(true);
+    const finalMessage = message.trim() || 'Your reservation has been processed. Thank you for choosing Madeena Restaurant.';
+    
     try {
-      await axiosInstance.put(`/reservations/${id}`, { status });
-      setToast({ message: `Reservation marked as ${status}!`, type: 'success' });
-      fetchReservations();
+      await axiosInstance.put(`/reservations/${modalData.id}`, { 
+        status: modalData.type === 'accept' ? 'Confirmed' : 'Rejected',
+        adminMessage: finalMessage
+      });
+      setToast({ message: `Reservation ${modalData.type === 'accept' ? 'accepted' : 'rejected'} successfully`, type: 'success' });
+      setModalData(null);
+      setMessage('');
+      fetchStats();
+
     } catch (error) {
-      setToast({ message: 'Status update failed', type: 'error' });
+      setToast({ message: 'Action failed', type: 'error' });
     } finally {
-      setActionLoading(null);
+      setActionLoading(false);
     }
   };
 
-  const filteredReservations = filter === 'All' 
-    ? reservations 
-    : reservations.filter(res => res.status === filter);
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Confirmed': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
-      case 'Pending': return 'bg-orange-50 text-orange-600 border-orange-100';
-      case 'Rejected': return 'bg-rose-50 text-rose-600 border-rose-100';
-      case 'Requested': return 'bg-indigo-50 text-indigo-600 border-indigo-100';
-      default: return 'bg-gray-50 text-gray-600 border-gray-100';
-    }
+  const toggleRow = (id) => {
+    setExpandedId(expandedId === id ? null : id);
   };
+
+  const isPastDate = (dateStr) => {
+    const resDate = new Date(dateStr);
+    const now = new Date();
+    return resDate < now;
+  };
+
+  const getStatus = (res) => {
+    if (res.status === 'Rejected') return 'rejected';
+    if (res.status === 'Confirmed') return 'accepted';
+    if (isPastDate(res.date || res.eventDate)) return 'completed';
+    return 'requested';
+  };
+
+  const activeReservations = reservations.filter(r => r.status !== 'Rejected' && !isPastDate(r.date || r.eventDate));
+  const inactiveReservations = reservations.filter(r => r.status === 'Rejected' || isPastDate(r.date || r.eventDate));
+
+  const currentList = filter === 'Active' ? activeReservations : inactiveReservations;
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
         <div className="w-16 h-16 border-4 border-[#8B3B3B]/10 border-t-[#8B3B3B] rounded-full animate-spin" />
-        <span className="font-black text-gray-400 uppercase tracking-widest text-[10px]">Syncing Hall Bookings...</span>
+        <span className="font-black text-gray-400 uppercase tracking-widest text-[10px]">Loading Reservations...</span>
     </div>
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8 pb-10">
       <Toast message={toast.message} type={toast.type} onClose={() => setToast({ message: '', type: 'success' })} />
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-3xl font-black text-gray-800 tracking-tighter">Hall Reservations</h1>
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Found {reservations.length} total booking requests</p>
-        </div>
-        <div className="flex gap-2 p-2 bg-gray-50 rounded-[2rem] w-fit overflow-x-auto no-scrollbar border border-gray-100 shadow-sm">
-          {['All', 'Requested', 'Pending', 'Confirmed', 'Rejected'].map((f) => (
-            <button key={f} onClick={() => setFilter(f)} className={clsx("px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all", filter === f ? 'bg-white text-[#8B3B3B] shadow-sm' : 'text-gray-400 hover:text-gray-600')}>{f}</button>
-          ))}
-        </div>
+      {/* Tabs */}
+      <div className="flex gap-10 border-b border-gray-50">
+          <button 
+              onClick={() => setFilter('Active')}
+              className={clsx(
+                  "pb-4 font-bold text-sm md:text-base capitalize transition-all relative",
+                  filter === 'Active' ? "text-[#8B3B3B]" : "text-gray-300 hover:text-gray-500"
+              )}
+          >
+              Active [{activeReservations.length}]
+              {filter === 'Active' && <motion.div layoutId="resTab" className="absolute bottom-0 left-0 right-0 h-1 bg-[#8B3B3B] rounded-full" />}
+          </button>
+          <button 
+              onClick={() => setFilter('Inactive')}
+              className={clsx(
+                  "pb-4 font-bold text-sm md:text-base capitalize transition-all relative",
+                  filter === 'Inactive' ? "text-[#8B3B3B]" : "text-gray-300 hover:text-gray-500"
+              )}
+          >
+              Inactive [{inactiveReservations.length}]
+              {filter === 'Inactive' && <motion.div layoutId="resTab" className="absolute bottom-0 left-0 right-0 h-1 bg-[#8B3B3B] rounded-full" />}
+          </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-        <AnimatePresence mode="popLayout">
-            {filteredReservations.map((res) => (
-            <motion.div 
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                key={res._id} 
-                className="bg-white rounded-[3rem] border border-gray-100 overflow-hidden shadow-sm hover:shadow-2xl transition-all group"
-            >
-                <div className="p-8 border-b border-gray-50 flex justify-between items-start">
-                <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl brand-gradient flex items-center justify-center text-white font-black text-xl shadow-lg shadow-primary-500/10">
-                    {res.fullName.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                    <h3 className="font-black text-gray-800 tracking-tight text-lg">{res.fullName}</h3>
-                    <div className={clsx("text-[9px] px-3 py-1 rounded-full font-black uppercase inline-block border mt-1", getStatusColor(res.status))}>
-                        {res.status}
-                    </div>
-                    </div>
-                </div>
-                <div className="text-right">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">{new Date(res.eventDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                    <div className="px-3 py-1.5 bg-gray-100 rounded-xl text-[10px] font-bold text-gray-600 flex items-center gap-2">
-                        <FiClock size={12} />
-                        {res.startTime} - {res.endTime}
-                    </div>
-                </div>
-                </div>
-
-                <div className="p-8 space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-2xl text-[10px] font-bold text-gray-500 hover:text-[#8B3B3B] transition-colors cursor-pointer border border-transparent hover:border-[#8B3B3B]/10">
-                        <FiPhone size={16} /> <span>{res.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-2xl text-[10px] font-bold text-gray-500 border border-transparent">
-                        <FiMail size={16} /> <span className="truncate">{res.email}</span>
-                    </div>
-                </div>
-
-                <div className="p-6 bg-[#8B3B3B]/5 rounded-[2rem] space-y-3 relative overflow-hidden">
-                    <div className="absolute right-4 top-4 text-[#8B3B3B]/10">
-                        <FiInfo size={40} />
-                    </div>
-                    <div className="flex items-center gap-2 text-[10px] font-black uppercase text-[#8B3B3B] relative z-10">
-                        <FiCalendar size={14} /> <span>{res.reservationType}</span>
-                    </div>
-                    <p className="text-xs text-gray-600 font-medium leading-relaxed relative z-10">"{res.specialRequirements || 'No special requirements listed for this booking.'}"</p>
-                </div>
-                </div>
-
-                <div className="p-6 bg-gray-50/50 flex gap-3">
-                {res.status !== 'Confirmed' && (
-                    <button 
-                        disabled={actionLoading === res._id} 
-                        onClick={() => handleStatusUpdate(res._id, 'Confirmed')} 
-                        className="flex-1 flex items-center justify-center gap-2 bg-[#8B3B3B] hover:bg-gray-800 text-white h-14 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl shadow-[#8B3B3B]/10 disabled:opacity-50"
-                    >
-                    {actionLoading === res._id ? <FiLoader className="animate-spin" /> : <><FiCheck size={18} /> Approve</>}
-                    </button>
-                )}
-                {res.status !== 'Rejected' && (
-                    <button 
-                        disabled={actionLoading === res._id} 
-                        onClick={() => handleStatusUpdate(res._id, 'Rejected')} 
-                        className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-rose-100 text-rose-500 hover:bg-rose-50 h-14 rounded-2xl text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
-                    >
-                    {actionLoading === res._id ? <FiLoader className="animate-spin" /> : <><FiX size={18} /> Reject</>}
-                    </button>
-                )}
-                </div>
-            </motion.div>
-            ))}
-        </AnimatePresence>
+      {/* List Header - Desktop Only */}
+      <div className="hidden md:grid grid-cols-4 bg-white/50 rounded-2xl p-6 text-[11px] font-black text-gray-400 uppercase tracking-widest">
+          <span>Status</span>
+          <span>Date and Time</span>
+          <span>End Date and Time</span>
+          <span className="text-right pr-10">Action</span>
       </div>
-      
-      {filteredReservations.length === 0 && (
-        <div className="text-center py-40 bg-white rounded-[3rem] border-2 border-dashed border-gray-100 flex flex-col items-center justify-center">
-          <FiCalendar size={64} className="text-gray-100 mb-6" />
-          <p className="text-gray-400 font-black uppercase tracking-widest text-xs italic">The reservations diary is empty for this view.</p>
-        </div>
+
+      {/* Rows */}
+      <div className="space-y-4">
+          <AnimatePresence mode="popLayout">
+              {currentList
+                .sort((a, b) => {
+                    const statusOrder = { 'accepted': 0, 'requested': 1, 'rejected': 2, 'completed': 3 };
+                    const statusA = getStatus(a);
+                    const statusB = getStatus(b);
+                    return (statusOrder[statusA] ?? 10) - (statusOrder[statusB] ?? 10);
+                })
+                .map((res) => {
+                  const status = getStatus(res);
+                  const isInactive = status === 'completed' || status === 'rejected';
+                  
+                  return (
+                      <motion.div 
+                          key={res._id}
+                          layout
+                          className={clsx(
+                              "bg-white rounded-[1.5rem] md:rounded-[2.5rem] p-6 border border-gray-100 shadow-sm transition-all duration-500",
+                              isInactive ? "opacity-60 grayscale-[0.2]" : "hover:shadow-2xl hover:shadow-gray-200/40 hover:-translate-y-1"
+                          )}
+                      >
+                          <div className="grid grid-cols-2 md:grid-cols-4 items-center gap-6">
+                              {/* Status */}
+                              <div className="flex items-center gap-4">
+                                  <span className={clsx(
+                                      "px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border",
+                                      status === 'accepted' ? "bg-emerald-50 text-emerald-500 border-emerald-100" :
+                                      status === 'requested' ? "bg-white text-gray-400 border-gray-100" :
+                                      status === 'completed' ? "bg-gray-50 text-gray-400 border-gray-100" :
+                                      "bg-rose-50 text-rose-500 border-rose-100"
+                                  )}>
+                                      {status}
+                                  </span>
+                              </div>
+
+                              {/* Start DateTime */}
+                              <div className="text-[11px] font-bold text-gray-800">
+                                  {new Date(res.date || res.eventDate).toLocaleDateString()}
+                                  <br />
+                                  <span className="text-gray-400">{res.startTime || '11:00'}</span>
+                              </div>
+
+                              {/* End DateTime */}
+                              <div className="hidden md:block text-[11px] font-bold text-gray-800">
+                                  {new Date(res.date || res.eventDate).toLocaleDateString()}
+                                  <br />
+                                  <span className="text-gray-400">{res.endTime || '14:00'}</span>
+                              </div>
+
+                              {/* Actions */}
+                              <div className="flex items-center justify-end gap-2 md:gap-6 md:pr-4">
+                                  {status === 'requested' && (
+                                      <div className="flex items-center gap-3">
+                                          <button 
+                                              onClick={() => setModalData({ id: res._id, type: 'accept' })}
+                                              className="text-[10px] font-black uppercase tracking-widest text-emerald-500 hover:text-emerald-600 transition-colors"
+                                          >
+                                              Approve
+                                          </button>
+                                          <button 
+                                              onClick={() => setModalData({ id: res._id, type: 'reject' })}
+                                              className="text-[10px] font-black uppercase tracking-widest text-rose-500 hover:text-rose-600 transition-colors"
+                                          >
+                                              Reject
+                                          </button>
+                                      </div>
+                                  )}
+                                  <div 
+                                      onClick={() => toggleRow(res._id)}
+                                      className="flex items-center gap-2 text-[10px] font-black text-gray-300 uppercase cursor-pointer hover:text-gray-800 transition-colors shrink-0"
+                                  >
+                                      More {expandedId === res._id ? <FiChevronUp /> : <FiChevronDown />}
+                                  </div>
+                              </div>
+                          </div>
+
+                          {/* Expandable Content */}
+                          <AnimatePresence>
+                              {expandedId === res._id && (
+                                  <motion.div 
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: 'auto', opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      className="overflow-hidden"
+                                  >
+                                      <div className="mt-8 pt-8 border-t border-gray-50 grid grid-cols-1 md:grid-cols-3 gap-8">
+                                          <div className="space-y-3">
+                                              <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Customer Info</p>
+                                              <p className="text-xs font-bold text-gray-700">{res.fullName || res.customerName || 'Anonymous'}</p>
+                                              <p className="text-[11px] text-gray-400 font-medium">{res.phone || res.customerPhone || 'N/A'}</p>
+                                              <p className="text-[11px] text-gray-400 font-medium">{res.email || 'No Email'}</p>
+                                          </div>
+                                          
+                                          <div className="space-y-3">
+                                              <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Booking Context</p>
+                                              <p className="text-xs font-bold text-gray-700">Type: <span className="font-medium">{res.reservationType || 'Normal Party'}</span></p>
+                                              <p className="text-xs font-bold text-gray-700">Party Size: <span className="font-medium">{res.partySize || res.guests || '02'}</span></p>
+                                              <p className="text-xs font-bold text-gray-700">Table: <span className="font-medium text-orange-500">{res.tableNo || res.tables || '#01'}</span></p>
+                                          </div>
+
+                                          <div className="space-y-3">
+                                              <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Special Notes</p>
+                                              <p className="text-xs text-gray-500 font-medium leading-relaxed italic">
+                                                "{res.specialRequirements || 'Flat 0% OFF on Total Bill'}"
+                                              </p>
+                                              {res.adminMessage && (
+                                                <div className="mt-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                                    <p className="text-[9px] font-black text-gray-400 uppercase mb-1">Admin Note</p>
+                                                    <p className="text-[10px] text-gray-600 font-medium italic">{res.adminMessage}</p>
+                                                </div>
+                                              )}
+                                          </div>
+                                      </div>
+                                  </motion.div>
+                              )}
+                          </AnimatePresence>
+                      </motion.div>
+                  );
+              })}
+          </AnimatePresence>
+      </div>
+
+      {/* Message Modal */}
+      <AnimatePresence>
+          {modalData && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+                  <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onClick={() => setModalData(null)}
+                      className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" 
+                  />
+                  <motion.div 
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.9, opacity: 0 }}
+                      className="bg-white rounded-[3rem] w-full max-w-md p-10 relative z-10 shadow-2xl"
+                  >
+                      <h3 className="text-2xl font-black text-gray-800 tracking-tighter mb-2 capitalize">
+                          {modalData.type} Reservation
+                      </h3>
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8">Send a message to the customer</p>
+                      
+                      <div className="relative">
+                          <FiMessageSquare className="absolute left-6 top-6 text-gray-300" />
+                          <textarea 
+                              placeholder="Write your message here or leave blank for default..."
+                              value={message}
+                              onChange={(e) => setMessage(e.target.value)}
+                              className="w-full bg-gray-50 border border-gray-100 rounded-[2rem] p-6 pl-14 h-40 text-sm font-medium outline-none focus:ring-2 focus:ring-[#8B3B3B]/10 transition-all resize-none"
+                          />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 mt-8">
+                          <button 
+                              onClick={() => setModalData(null)}
+                              className="py-4 rounded-2xl bg-gray-100 text-gray-500 font-black text-[10px] uppercase tracking-widest hover:bg-gray-200 transition-all"
+                          >
+                              Cancel
+                          </button>
+                          <button 
+                              onClick={handleStatusUpdate}
+                              disabled={actionLoading}
+                              className={clsx(
+                                  "py-4 rounded-2xl text-white font-black text-[10px] uppercase tracking-widest shadow-xl transition-all flex items-center justify-center gap-2",
+                                  modalData.type === 'accept' ? 'bg-emerald-500 shadow-emerald-500/20' : 'bg-rose-500 shadow-rose-500/20'
+                              )}
+                          >
+                              {actionLoading ? <FiLoader className="animate-spin" /> : (modalData.type === 'accept' ? 'Accept' : 'Reject')}
+                          </button>
+                      </div>
+                  </motion.div>
+              </div>
+          )}
+      </AnimatePresence>
+
+      {currentList.length === 0 && (
+          <div className="py-20 text-center">
+              <p className="text-gray-300 font-black uppercase tracking-widest text-sm">No reservations found in this section</p>
+          </div>
       )}
     </div>
   );

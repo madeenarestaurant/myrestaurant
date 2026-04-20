@@ -1,4 +1,5 @@
 const Reservation = require('../models/Reservation');
+const Visitor = require('../models/Visitor');
 const Otp = require('../models/Otp');
 const nodemailer = require('nodemailer');
 
@@ -54,7 +55,7 @@ exports.sendOtp = async (req, res) => {
 // @route   POST /api/reservations/verify-otp
 exports.verifyOtp = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { email, otp, visitorId } = req.body;
     if (!email || !otp) return res.status(400).json({ message: 'Email and OTP inputs are required' });
 
     const existingOtp = await Otp.findOne({ email, otp });
@@ -64,6 +65,11 @@ exports.verifyOtp = async (req, res) => {
 
     existingOtp.isVerified = true;
     await existingOtp.save();
+
+    // Mark visitor as email verified
+    if (visitorId) {
+        await Visitor.findOneAndUpdate({ visitorId }, { emailVerified: true });
+    }
 
     res.status(200).json({ message: 'Email verified successfully!' });
   } catch (error) {
@@ -76,7 +82,7 @@ exports.createReservation = async (req, res) => {
   try {
     const { 
         fullName, email, phone, eventDate, startTime, endTime, 
-        guests, reservationType, type, venueDetails, specialRequirements 
+        guests, reservationType, type, venueDetails, specialRequirements, visitorId 
     } = req.body;
 
     // Support both 'reservationType' and 'type' for compatibility
@@ -96,6 +102,19 @@ exports.createReservation = async (req, res) => {
     });
 
     await newReservation.save();
+
+    // Link to Visitor if ID provided
+    if (visitorId) {
+        await Visitor.findOneAndUpdate(
+            { visitorId },
+            { $push: { reservations: newReservation._id } }
+        );
+    }
+
+    // Emit socket event for real-time update
+    if (req.io) {
+        req.io.emit('new_reservation', newReservation);
+    }
 
     // Notify user that request is received
     const userMailOptions = {

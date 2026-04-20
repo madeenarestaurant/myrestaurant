@@ -2,23 +2,44 @@ import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import { MoveRight, Star, Clock, Globe, Utensils, Users } from "lucide-react";
 
-// Importing all assets dynamically
-const imagesGlob = import.meta.glob("../assets/*.{png,jpg,jpeg,webp}", { eager: true });
-const videosGlob = import.meta.glob("../assets/*.{mp4,webm}", { eager: true });
+import { getAssetUrl } from "../config";
+
+const imageFiles = [
+  "outlet.jpeg", 
+  "reservation-hall.jpeg", 
+  "family.jpeg", 
+  "menu.jpeg", 
+  "img1.jpeg",
+  "img2.jpeg",
+  "img3.jpeg",
+  "img4.jpeg",
+  "img5.jpeg",
+  "img6.jpeg",
+  "img7.jpeg",
+  "img8.jpeg",
+  "img9.jpeg"
+];
+
+const videoFiles = [
+  "res-video.mp4",
+  "outletv.mp4"
+];
+
 
 const excludeKeywords = ["locationqr", "logo", "titlename", "menu"];
 
-const images = Object.entries(imagesGlob)
-  .filter(([path]) => !excludeKeywords.some(keyword => path.toLowerCase().includes(keyword)))
-  .map(([path, module]) => ({
-    path: module.default,
-    name: path.split("/").pop().replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
+const images = imageFiles
+  .filter(file => !excludeKeywords.some(keyword => file.toLowerCase().includes(keyword)))
+  .map(file => ({
+    path: getAssetUrl(file),
+    name: file.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
   }));
 
-const videos = Object.entries(videosGlob).map(([path, module]) => ({
-  path: module.default,
-  name: path.split("/").pop().replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
+const videos = videoFiles.map(file => ({
+  path: getAssetUrl(file),
+  name: file.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
 }));
+
 
 const About = () => {
   return (

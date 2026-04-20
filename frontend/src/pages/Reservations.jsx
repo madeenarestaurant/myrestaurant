@@ -5,9 +5,14 @@ import { reservationApi } from "../services/api";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./Reservations.css";
-import reservationHall from "../assets/reserve.png";
-import familyImg from "../assets/family.jpeg";
-import partiesImg from "../assets/parties.jpeg";
+import { getAssetUrl } from "../config";
+import trackingService from "../services/trackingService";
+
+
+const reservationHall = getAssetUrl("reserve.png");
+const familyImg = getAssetUrl("family.jpeg");
+const partiesImg = getAssetUrl("parties.jpeg");
+
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -70,7 +75,7 @@ const Reservations = () => {
     if (!otp) return notify("Enter the OTP.", true);
     setLoading(true);
     try {
-      await reservationApi.verifyOtp(form.email, otp);
+      await reservationApi.verifyOtp(form.email, otp, trackingService.visitorId);
       setEmailVerified(true);
       setOtpSent(false);
       notify("Email verified ✓");
@@ -93,6 +98,7 @@ const Reservations = () => {
         ...form,
         type,
         eventDate: form.eventDate.toISOString().split("T")[0],
+        visitorId: trackingService.visitorId
       });
       setStep(3);
     } catch (e) {

@@ -11,9 +11,23 @@ const api = axios.create({
 // Reservation specific API calls
 export const reservationApi = {
   sendOtp: (email) => api.post('/reservations/send-otp', { email }),
-  verifyOtp: (email, otp) => api.post('/reservations/verify-otp', { email, otp }),
+  verifyOtp: (email, otp, visitorId) => api.post('/reservations/verify-otp', { email, otp, visitorId }),
+
   book: (data) => api.post('/reservations/book', data),
   getOccupiedSlots: (date) => api.get(`/reservations/occupied-slots/${date}`),
 };
+
+export const productApi = {
+  getAll: () => api.get('/products'),
+};
+
+export const categoryApi = {
+  getAll: () => api.get('/categories'),
+};
+
+export const orderApi = {
+  create: (data) => api.post('/orders', data),
+};
+
 
 export default api;

@@ -3,12 +3,15 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 
-// Assets
-import resVideo from "../assets/res-video.mp4";
-import outletImg from "../assets/outlet.jpeg";
-import reserveImg from "../assets/reservation-hall.jpeg";
-import familyImg from "../assets/family.jpeg";
-import menuImg from "../assets/menu.jpeg";
+import { getAssetUrl } from "../config";
+
+const resVideo = getAssetUrl("res-video.mp4");
+const outletImg = getAssetUrl("outlet.jpeg");
+const reserveImg = getAssetUrl("reservation-hall.jpeg");
+const familyImg = getAssetUrl("family.jpeg");
+const menuImg = getAssetUrl("menu.jpeg");
+const orderImg = getAssetUrl("img1.jpeg");
+
 
 // Inline SVG Icons for social section (keeping them here as they are local to Home)
 const Icons = {
@@ -70,11 +73,12 @@ const Home = () => {
           </div>
 
           {/* Right Section: Scrollable Navigation Sidebar */}
-          <div className="lg:col-span-1 h-full overflow-y-auto no-scrollbar flex flex-col gap-4 lg:gap-6 pb-20 lg:pb-0">
+          <div className="lg:col-span-1 h-full overflow-y-auto no-scrollbar flex flex-col gap-4 lg:gap-6 pb-24 md:pb-32 lg:pb-0">
             <SideCard title="MENU" image={menuImg} link="/menu" delay={0.2} />
-            <SideCard title="ABOUT US" image={familyImg} link="/about" delay={0.4} />
-            <SideCard title="OUR OUTLETS" image={outletImg} link="/locations" delay={0.6} />
-            <SideCard title="RESERVATIONS" image={reserveImg} link="/reservations" delay={0.8} />
+            <SideCard title="ORDER ONLINE" image={orderImg} link="/order" delay={0.4} />
+            <SideCard title="RESERVATIONS" image={reserveImg} link="/reservations" delay={0.6} />
+            <SideCard title="ABOUT US" image={familyImg} link="/about" delay={0.8} />
+            <SideCard title="OUR OUTLETS" image={outletImg} link="/locations" delay={1.0} />
           </div>
 
         </div>

@@ -13,8 +13,12 @@ const useAdminStore = create((set, get) => ({
     totalRevenue: 0,
     totalProducts: 0,
     totalCategories: 0,
-    totalReservations: 0
+    totalReservations: 0,
+    totalVisitors: 0,
+    onlineVisitors: 0,
+    topPages: []
   },
+
   
   products: [],
   categories: [],
@@ -48,12 +52,14 @@ const useAdminStore = create((set, get) => ({
   fetchStats: async () => {
     set({ loading: true });
     try {
-        const [prodRes, catRes, orderRes, resvRes] = await Promise.all([
+        const [prodRes, catRes, orderRes, resvRes, visitorRes] = await Promise.all([
             axiosInstance.get('/products'),
             axiosInstance.get('/categories'),
             axiosInstance.get('/orders'),
-            axiosInstance.get('/reservations').catch(() => ({ data: [] }))
+            axiosInstance.get('/reservations').catch(() => ({ data: [] })),
+            axiosInstance.get('/visitors/stats').catch(() => ({ data: { totalVisitors: 0, onlineVisitors: 0, topPages: [] } }))
         ]);
+
         
         const orders = orderRes.data || [];
         const products = prodRes.data || [];
@@ -75,8 +81,12 @@ const useAdminStore = create((set, get) => ({
                 totalRevenue,
                 totalProducts: products.length,
                 totalCategories: categories.length,
-                totalReservations: reservations.length
+                totalReservations: reservations.length,
+                totalVisitors: visitorRes.data.totalVisitors,
+                onlineVisitors: visitorRes.data.onlineVisitors,
+                topPages: visitorRes.data.topPages
             },
+
             products,
             categories,
             recentOrders: orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 10),
@@ -175,8 +185,43 @@ const useAdminStore = create((set, get) => ({
         console.error('Error creating category:', error);
         return { success: false, error: error.response?.data?.message };
     }
+  },
+
+  initSocket: (socket) => {
+    if (!socket) return;
+
+    socket.on('new_order', (order) => {
+        set((state) => ({
+            recentOrders: [order, ...state.recentOrders].slice(0, 10),
+            stats: { 
+                ...state.stats, 
+                totalOrders: state.stats.totalOrders + 1,
+                pendingOrders: state.stats.pendingOrders + 1
+            }
+        }));
+        // Optional: show notification
+        console.log('New Order Received:', order);
+    });
+
+    socket.on('new_reservation', (reservation) => {
+        set((state) => ({
+            reservations: [reservation, ...state.reservations],
+            stats: { 
+                ...state.stats, 
+                totalReservations: state.stats.totalReservations + 1
+            }
+        }));
+        console.log('New Reservation Received:', reservation);
+    });
+
+    socket.on('online_count', (count) => {
+        set((state) => ({
+            stats: { ...state.stats, onlineVisitors: count }
+        }));
+    });
   }
 
 }));
+
 
 export default useAdminStore;

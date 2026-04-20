@@ -7,11 +7,25 @@ import Orders from '../pages/Orders';
 import Products from '../pages/Products';
 import Reservations from '../pages/Reservations';
 import Settings from '../pages/Settings';
+import Profile from '../pages/Profile';
 import useAdminStore from '../store/useAdminStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { io } from 'socket.io-client';
+import { useEffect } from 'react';
+
 const AdminLayout = () => {
-  const { activeTab } = useAdminStore();
+  const { activeTab, initSocket } = useAdminStore();
+
+  useEffect(() => {
+    const socket = io('http://localhost:5001');
+    initSocket(socket);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
 
   const renderContent = () => {
     switch (activeTab) {
@@ -20,6 +34,7 @@ const AdminLayout = () => {
       case 'products': return <Products />;
       case 'reservations': return <Reservations />;
       case 'settings': return <Settings />;
+      case 'profile': return <Profile />;
       default: return <Dashboard />;
     }
   };

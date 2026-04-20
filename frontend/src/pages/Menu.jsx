@@ -2,17 +2,26 @@ import React from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 
-// Dynamically import all images from the assets folder.
-const assetModules = import.meta.glob('../assets/*.{jpeg,jpg,png,webp}', { eager: true, query: '?url', import: 'default' });
+import { getAssetUrl } from "../config";
 
 const getImage = (name) => {
   if (!name) return null;
-  const match = Object.keys(assetModules).find(path => {
-    const fileName = path.split('/').pop().split('.')[0];
-    return fileName.toLowerCase() === name.toLowerCase();
-  });
-  return match ? assetModules[match] : null;
+  
+  const nameLower = name.toLowerCase();
+  
+  // Handling extensions based on the actual files that were in assets
+  if (["arabic salad", "greek salad", "shirazi salad"].includes(nameLower)) {
+    return getAssetUrl(`${name}.webp`);
+  }
+  
+  if (["logo", "reserve"].includes(nameLower)) {
+    return getAssetUrl(`${name}.png`);
+  }
+  
+  return getAssetUrl(`${name}.jpeg`);
 };
+
+
 
 const menuData = [
   {

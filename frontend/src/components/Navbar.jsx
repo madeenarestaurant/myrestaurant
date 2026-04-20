@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import { motion, AnimatePresence } from "framer-motion";
-import logoImg from "../assets/logo.png";
-import titleImg from "../assets/titlename.jpeg";
+import { getAssetUrl } from "../config";
+
+const logoImg = getAssetUrl("logo.png");
+const titleImg = getAssetUrl("titlename.jpeg");
+
 
 const Icons = {
   Menu: () => (
@@ -27,10 +30,10 @@ const Navbar = ({ transparent = true }) => {
   const menuItems = [
     { name: "HOME", path: "/" },
     { name: "MENU", path: "/menu" },
+    { name: "ORDER", path: "/order" },
+    { name: "RESERVATIONS", path: "/reservations" },
     { name: "ABOUT", path: "/about" },
     { name: "OUR OUTLETS", path: "/locations" },
-    { name: "RESERVATIONS", path: "/reservations" },
-    
   ];
 
   return (

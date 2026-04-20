@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
-import { FiMail, FiLock, FiEye, FiEyeOff, FiLoader, FiFacebook } from 'react-icons/fi';
-import { FcGoogle } from 'react-icons/fc';
-import { clsx } from 'clsx';
+import Cookies from 'js-cookie';
+import { FiMail, FiLock, FiEye, FiEyeOff, FiLoader } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 
 const Login = () => {
@@ -20,7 +19,7 @@ const Login = () => {
     setError('');
     try {
       const { data } = await axiosInstance.post('/admin/login', { email, password });
-      localStorage.setItem('token', data.token);
+      Cookies.set('token', data.token, { expires: 7 }); // Expires in 7 days
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid credentials');
@@ -49,18 +48,20 @@ const Login = () => {
         className="relative z-10 w-full max-w-lg mx-auto p-4 md:p-8"
       >
         {/* Mobile View - Slide up white container as per image */}
-        <div className="bg-white rounded-[3rem] shadow-2xl p-10 md:p-14 relative overflow-hidden">
+        <div className="bg-white rounded-[2.5rem] md:rounded-[3rem] shadow-2xl p-6 md:p-14 relative overflow-hidden">
             {/* Logo Section exactly like image */}
-            <div className="flex flex-col items-center mb-12">
-                <div className="w-20 h-20 rounded-2xl brand-gradient flex items-center justify-center p-0.5 shadow-xl mb-4 rotate-3">
-                    <div className="w-full h-full bg-[#8B3B3B] rounded-2xl border-4 border-[#C19A6B]/30 flex items-center justify-center text-white font-black text-2xl">
-                        M
+            <div className="flex flex-col items-center mb-6">
+                <div className="relative group">
+                    <div className="absolute inset-0 bg-[#c59d5f]/10 blur-[30px] rounded-[2rem] scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                    <div className="relative overflow-hidden rounded-[1.2rem] border-2 border-[#c59d5f]/40 bg-[#3a1515] shadow-xl transition-all duration-500 group-hover:scale-[1.02]">
+                        <img 
+                            src="https://madeena-res-bucket.s3.us-east-1.amazonaws.com/res-files/titlename.jpeg" 
+                            alt="Madeena Logo" 
+                            className="w-full h-auto max-w-[160px] md:max-w-[220px] object-contain transition-transform duration-700 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />
                     </div>
                 </div>
-                <h1 className="text-3xl font-black text-gray-800 tracking-tighter leading-none">MADEENA</h1>
-                <p className="text-[10px] font-black text-[#C19A6B] uppercase tracking-[0.3em] mt-2">Restaurant Since 1975</p>
-                
-                <div className="w-16 h-1 brand-gradient rounded-full mt-6 opacity-30" />
             </div>
 
             <form onSubmit={handleLogin} className="space-y-6">
@@ -82,7 +83,13 @@ const Login = () => {
                 <div className="space-y-2">
                     <div className="flex justify-between items-center px-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Secret Key</label>
-                        <button type="button" className="text-[10px] font-black text-primary-600 uppercase hover:underline">Forgot?</button>
+                        <button 
+                            type="button" 
+                            onClick={() => navigate('/register')}
+                            className="text-[10px] font-black text-primary-600 uppercase hover:underline"
+                        >
+                            Forgot?
+                        </button>
                     </div>
                     <div className="relative">
                         <input 
@@ -115,28 +122,6 @@ const Login = () => {
                     {loading ? <FiLoader className="animate-spin" /> : 'Sign In Now'}
                 </button>
             </form>
-
-            <div className="mt-12">
-                <div className="relative flex items-center justify-center mb-8">
-                    <div className="absolute w-full h-[1px] bg-gray-100" />
-                    <span className="relative bg-white px-4 text-[10px] font-black text-gray-300 uppercase tracking-widest">or continue with</span>
-                </div>
-                
-                <div className="flex gap-4">
-                    <button className="flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-gray-50 hover:bg-gray-50 transition-all group">
-                        <FcGoogle size={20} />
-                        <span className="text-xs font-black text-gray-700 uppercase tracking-tight">Google</span>
-                    </button>
-                    <button className="flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-gray-50 hover:bg-gray-50 transition-all group">
-                        <FiFacebook size={20} className="text-[#1877F2]" />
-                        <span className="text-xs font-black text-gray-700 uppercase tracking-tight">Facebook</span>
-                    </button>
-                </div>
-            </div>
-
-            <p className="mt-12 text-center text-xs font-bold text-gray-400">
-                New to Madeena? <button onClick={() => navigate('/register')} className="text-primary-600 hover:underline">Create an account</button>
-            </p>
         </div>
       </motion.div>
     </div>

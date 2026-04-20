@@ -1,9 +1,12 @@
 import React, { useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { motion } from "framer-motion";
-import outletVideo from "../assets/outletv.mp4";
-import locationQr from "../assets/locationqr.jpeg";
-import outletImg from "../assets/outlet.jpeg";
+import { getAssetUrl } from "../config";
+
+const outletVideo = getAssetUrl("outletv.mp4");
+const locationQr = getAssetUrl("locationqr.jpeg");
+const outletImg = getAssetUrl("outlet.jpeg");
+
 
 const Locations = () => {
   useEffect(() => {
