@@ -5,6 +5,7 @@
   --color-accent: #ff0000;
   --font-serif: "Playfair Display", serif;
   --font-sans: "Inter", sans-serif;
+  --font-outfit: "Outfit", sans-serif;
 }
 
 @layer base {

@@ -6,18 +6,18 @@ import { getAssetUrl } from "../config";
 
 const getImage = (name) => {
   if (!name) return null;
-  
+
   const nameLower = name.toLowerCase();
-  
+
   // Handling extensions based on the actual files that were in assets
   if (["arabic salad", "greek salad", "shirazi salad"].includes(nameLower)) {
     return getAssetUrl(`${name}.webp`);
   }
-  
+
   if (["logo", "reserve"].includes(nameLower)) {
     return getAssetUrl(`${name}.png`);
   }
-  
+
   return getAssetUrl(`${name}.jpeg`);
 };
 

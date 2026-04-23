@@ -32,12 +32,12 @@ const Icons = {
 const Home = () => {
   return (
     <>
-      <div className="h-screen bg-black p-4 lg:p-6 font-sans text-neutral-200 overflow-hidden">
-        <div className="max-w-[1800px] mx-auto h-full grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 overflow-hidden">
+      <div className="min-h-screen lg:h-screen bg-black p-4 lg:p-6 font-sans text-neutral-200 overflow-y-auto lg:overflow-hidden custom-scrollbar">
+        <div className="max-w-[1800px] mx-auto h-auto lg:h-full grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
 
 
           {/* Left Section: Main Video (Fixed) */}
-          <div className="lg:col-span-3 h-[50vh] lg:h-full relative rounded-2xl lg:rounded-[1rem] overflow-hidden bg-[#0c0c0c] group shadow-2xl">
+          <div className="lg:col-span-3 h-[60vh] lg:h-full relative rounded-2xl lg:rounded-[1rem] overflow-hidden bg-[#0c0c0c] group shadow-2xl">
             <Navbar transparent={true} />
 
             <video
@@ -73,7 +73,7 @@ const Home = () => {
           </div>
 
           {/* Right Section: Scrollable Navigation Sidebar */}
-          <div className="lg:col-span-1 h-full overflow-y-auto no-scrollbar flex flex-col gap-4 lg:gap-6 pb-24 md:pb-32 lg:pb-0">
+          <div className="lg:col-span-1 h-auto lg:h-full lg:overflow-y-auto no-scrollbar flex flex-col gap-4 lg:gap-6 pb-24 md:pb-32 lg:pb-0">
             <SideCard title="MENU" image={menuImg} link="/menu" delay={0.2} />
             <SideCard title="ORDER ONLINE" image={orderImg} link="/order" delay={0.4} />
             <SideCard title="RESERVATIONS" image={reserveImg} link="/reservations" delay={0.6} />

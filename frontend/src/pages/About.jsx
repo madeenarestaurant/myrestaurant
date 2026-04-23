@@ -44,10 +44,9 @@ const videos = videoFiles.map(file => ({
 const About = () => {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-neutral-300 font-sans selection:bg-amber-500 selection:text-black overflow-x-hidden">
-      <Navbar transparent={false} />
-
       {/* Hero Section */}
-      <section className="relative h-[100vh] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[100vh] flex flex-col items-center justify-center overflow-hidden">
+        <Navbar transparent={true} />
         <div className="absolute inset-0 z-0">
           <video 
             autoPlay 
