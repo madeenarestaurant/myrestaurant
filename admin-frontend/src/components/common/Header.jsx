@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { FiSearch, FiBell, FiUser, FiMoon, FiSun, FiMic, FiChevronRight, FiMail, FiLogOut, FiSettings } from 'react-icons/fi';
+import { FiSearch, FiBell, FiUser, FiMoon, FiSun, FiMic, FiChevronRight, FiMail, FiLogOut, FiSettings, FiShoppingBag, FiCalendar, FiX } from 'react-icons/fi';
 import useThemeStore from '../../store/useThemeStore';
 import useAdminStore from '../../store/useAdminStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,7 +9,7 @@ import Cookies from 'js-cookie';
 
 const Header = () => {
   const { darkMode, toggleDarkMode, notifications } = useThemeStore();
-  const { activeTab, setActiveTab, profile, fetchProfile } = useAdminStore();
+  const { activeTab, setActiveTab, profile, fetchProfile, newNotification } = useAdminStore();
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const popupRef = useRef(null);
 
@@ -50,10 +50,16 @@ const Header = () => {
 
         {/* Right Side Icons */}
         <div className="flex items-center gap-4 md:gap-8">
-            <button className="text-gray-400 hover:text-[#8B3B3B] transition-colors relative">
+            <button 
+                onClick={() => setActiveTab('notifications')}
+                className={clsx(
+                    "text-gray-400 hover:text-[#8B3B3B] transition-colors relative p-2 rounded-xl",
+                    activeTab === 'notifications' && "text-[#8B3B3B] bg-[#8B3B3B]/5"
+                )}
+            >
                 <FiBell size={20} />
                 {notifications && (
-                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white" />
+                    <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white" />
                 )}
             </button>
             
@@ -145,6 +151,46 @@ const Header = () => {
             </div>
         </div>
       </div>
+
+      {/* Real-time Notification Toast */}
+      <AnimatePresence>
+        {newNotification && (
+          <motion.div
+            initial={{ opacity: 0, x: 100, scale: 0.9 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 100, scale: 0.9 }}
+            className="fixed top-4 right-4 z-[100] w-full max-w-[320px]"
+          >
+            <div className="bg-white/95 backdrop-blur-sm border border-gray-100 shadow-2xl rounded-3xl p-4 flex items-start gap-4">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
+                newNotification.type === 'order' ? 'bg-amber-50 text-amber-600' : 'bg-indigo-50 text-indigo-600'
+              }`}>
+                {newNotification.type === 'order' ? <FiShoppingBag size={20} /> : <FiCalendar size={20} />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#8B3B3B] mb-1">
+                  New {newNotification.type}
+                </p>
+                <p className="text-xs font-bold text-gray-800 leading-tight">
+                  {newNotification.message}
+                </p>
+                <button 
+                  onClick={() => setActiveTab('notifications')}
+                  className="mt-2 text-[10px] font-black text-[#8B3B3B] uppercase hover:underline"
+                >
+                  View Details
+                </button>
+              </div>
+              <button 
+                onClick={() => useAdminStore.setState({ newNotification: null })}
+                className="text-gray-300 hover:text-gray-500 transition-colors"
+              >
+                <FiX size={14} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

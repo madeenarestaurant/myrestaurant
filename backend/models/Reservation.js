@@ -18,11 +18,11 @@ const ReservationSchema = new mongoose.Schema({
     status: { 
         type: String, 
         default: 'Pending', 
-        enum: ['Pending', 'Confirmed', 'Rejected', 'Cancelled', 'Requested'] 
+        enum: ['Pending', 'Confirmed', 'Rejected', 'Cancelled', 'Requested', 'Completed', 'No Occasion Found'] 
     },
     adminSelection: { type: String }, // For admin notes or choice
     totalPrice: { type: Number },
-    paymentStatus: { type: String, default: 'Unpaid' },
+    paymentStatus: { type: String, default: 'Unpaid', enum: ['Unpaid', 'Paid'] },
     messageToUser: { type: String }, // For the message sent back to user
     createdDate: { type: Date, default: Date.now }
 }, { timestamps: true });

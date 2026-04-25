@@ -8,6 +8,7 @@ import Products from '../pages/Products';
 import Reservations from '../pages/Reservations';
 import Settings from '../pages/Settings';
 import Profile from '../pages/Profile';
+import Notifications from '../pages/Notifications';
 import useAdminStore from '../store/useAdminStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -18,7 +19,10 @@ const AdminLayout = () => {
   const { activeTab, initSocket } = useAdminStore();
 
   useEffect(() => {
-    const socket = io('http://localhost:5001');
+    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+    const socketUrl = apiBase.endsWith('/api') ? apiBase.replace('/api', '') : apiBase;
+    
+    const socket = io(socketUrl);
     initSocket(socket);
 
     return () => {
@@ -35,6 +39,7 @@ const AdminLayout = () => {
       case 'reservations': return <Reservations />;
       case 'settings': return <Settings />;
       case 'profile': return <Profile />;
+      case 'notifications': return <Notifications />;
       default: return <Dashboard />;
     }
   };

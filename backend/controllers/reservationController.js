@@ -1,6 +1,7 @@
 const Reservation = require('../models/Reservation');
 const Visitor = require('../models/Visitor');
 const Otp = require('../models/Otp');
+const Notification = require('../models/Notification');
 const nodemailer = require('nodemailer');
 
 // Initialize NodeMailer
@@ -111,9 +112,18 @@ exports.createReservation = async (req, res) => {
         );
     }
 
+    // Create Notification
+    const notification = new Notification({
+        type: 'reservation',
+        message: `New reservation request from ${fullName}`,
+        relatedId: newReservation._id
+    });
+    await notification.save();
+
     // Emit socket event for real-time update
     if (req.io) {
         req.io.emit('new_reservation', newReservation);
+        req.io.emit('new_notification', notification);
     }
 
     // Notify user that request is received

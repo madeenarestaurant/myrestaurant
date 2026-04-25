@@ -12,11 +12,14 @@ import {
     FiCheck, 
     FiX,
     FiMessageSquare,
-    FiLoader
+    FiLoader,
+    FiClock,
+    FiCalendar
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import Toast from '../components/common/Toast';
 import { clsx } from 'clsx';
+import { format, isPast, parseISO } from 'date-fns'; // triggered re-scan
 
 const Reservations = () => {
   const { reservations, fetchStats, loading, stats } = useAdminStore();
@@ -31,18 +34,17 @@ const Reservations = () => {
     fetchStats();
   }, []);
 
-
-  const handleStatusUpdate = async () => {
-    if (!modalData) return;
+  const handleStatusUpdate = async (id, status, paymentStatus) => {
     setActionLoading(true);
-    const finalMessage = message.trim() || 'Your reservation has been processed. Thank you for choosing Madeena Restaurant.';
+    const finalMessage = message.trim() || 'Your reservation status has been updated. Thank you for choosing Madeena Restaurant.';
     
     try {
-      await axiosInstance.put(`/reservations/${modalData.id}`, { 
-        status: modalData.type === 'accept' ? 'Confirmed' : 'Rejected',
-        adminMessage: finalMessage
+      await axiosInstance.put(`/reservations/${id || modalData.id}`, { 
+        status: status || (modalData.type === 'accept' ? 'Confirmed' : 'Rejected'),
+        messageToUser: finalMessage,
+        paymentStatus: paymentStatus
       });
-      setToast({ message: `Reservation ${modalData.type === 'accept' ? 'accepted' : 'rejected'} successfully`, type: 'success' });
+      setToast({ message: `Reservation updated successfully`, type: 'success' });
       setModalData(null);
       setMessage('');
       fetchStats();
@@ -54,25 +56,36 @@ const Reservations = () => {
     }
   };
 
-  const toggleRow = (id) => {
-    setExpandedId(expandedId === id ? null : id);
+  const isVenueTimeFinished = (eventDate, endTime) => {
+    try {
+      const date = new Date(eventDate);
+      const [hours, minutes] = endTime.split(':');
+      date.setHours(parseInt(hours), parseInt(minutes), 0);
+      return isPast(date);
+    } catch (e) {
+      return isPast(new Date(eventDate));
+    }
   };
 
-  const isPastDate = (dateStr) => {
-    const resDate = new Date(dateStr);
-    const now = new Date();
-    return resDate < now;
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'Confirmed': return 'bg-emerald-50 text-emerald-500 border-emerald-100';
+      case 'Rejected': return 'bg-rose-50 text-rose-500 border-rose-100';
+      case 'Completed': return 'bg-indigo-50 text-indigo-500 border-indigo-100';
+      case 'No Occasion Found': return 'bg-gray-100 text-gray-500 border-gray-200';
+      default: return 'bg-amber-50 text-amber-500 border-amber-100';
+    }
   };
 
-  const getStatus = (res) => {
-    if (res.status === 'Rejected') return 'rejected';
-    if (res.status === 'Confirmed') return 'accepted';
-    if (isPastDate(res.date || res.eventDate)) return 'completed';
-    return 'requested';
-  };
+  const activeReservations = reservations.filter(r => 
+    !isVenueTimeFinished(r.eventDate, r.endTime) && 
+    (r.status === 'Pending' || r.status === 'Requested' || r.status === 'Confirmed')
+  );
 
-  const activeReservations = reservations.filter(r => r.status !== 'Rejected' && !isPastDate(r.date || r.eventDate));
-  const inactiveReservations = reservations.filter(r => r.status === 'Rejected' || isPastDate(r.date || r.eventDate));
+  const inactiveReservations = reservations.filter(r => 
+    isVenueTimeFinished(r.eventDate, r.endTime) || 
+    r.status === 'Rejected' || r.status === 'Completed' || r.status === 'No Occasion Found'
+  );
 
   const currentList = filter === 'Active' ? activeReservations : inactiveReservations;
 
@@ -89,49 +102,30 @@ const Reservations = () => {
 
       {/* Tabs */}
       <div className="flex gap-10 border-b border-gray-50">
-          <button 
-              onClick={() => setFilter('Active')}
-              className={clsx(
-                  "pb-4 font-bold text-sm md:text-base capitalize transition-all relative",
-                  filter === 'Active' ? "text-[#8B3B3B]" : "text-gray-300 hover:text-gray-500"
-              )}
-          >
-              Active [{activeReservations.length}]
-              {filter === 'Active' && <motion.div layoutId="resTab" className="absolute bottom-0 left-0 right-0 h-1 bg-[#8B3B3B] rounded-full" />}
-          </button>
-          <button 
-              onClick={() => setFilter('Inactive')}
-              className={clsx(
-                  "pb-4 font-bold text-sm md:text-base capitalize transition-all relative",
-                  filter === 'Inactive' ? "text-[#8B3B3B]" : "text-gray-300 hover:text-gray-500"
-              )}
-          >
-              Inactive [{inactiveReservations.length}]
-              {filter === 'Inactive' && <motion.div layoutId="resTab" className="absolute bottom-0 left-0 right-0 h-1 bg-[#8B3B3B] rounded-full" />}
-          </button>
-      </div>
-
-      {/* List Header - Desktop Only */}
-      <div className="hidden md:grid grid-cols-4 bg-white/50 rounded-2xl p-6 text-[11px] font-black text-gray-400 uppercase tracking-widest">
-          <span>Status</span>
-          <span>Date and Time</span>
-          <span>End Date and Time</span>
-          <span className="text-right pr-10">Action</span>
+          {[
+              { id: 'Active', count: activeReservations.length },
+              { id: 'Inactive', count: inactiveReservations.length }
+          ].map(tab => (
+            <button 
+                key={tab.id}
+                onClick={() => setFilter(tab.id)}
+                className={clsx(
+                    "pb-4 font-bold text-sm md:text-base capitalize transition-all relative",
+                    filter === tab.id ? "text-[#8B3B3B]" : "text-gray-300 hover:text-gray-500"
+                )}
+            >
+                {tab.id} <span className="text-[10px] opacity-40">[{tab.count}]</span>
+                {filter === tab.id && <motion.div layoutId="resTab" className="absolute bottom-0 left-0 right-0 h-1 bg-[#8B3B3B] rounded-full" />}
+            </button>
+          ))}
       </div>
 
       {/* Rows */}
       <div className="space-y-4">
           <AnimatePresence mode="popLayout">
-              {currentList
-                .sort((a, b) => {
-                    const statusOrder = { 'accepted': 0, 'requested': 1, 'rejected': 2, 'completed': 3 };
-                    const statusA = getStatus(a);
-                    const statusB = getStatus(b);
-                    return (statusOrder[statusA] ?? 10) - (statusOrder[statusB] ?? 10);
-                })
-                .map((res) => {
-                  const status = getStatus(res);
-                  const isInactive = status === 'completed' || status === 'rejected';
+              {currentList.map((res) => {
+                  const finished = isVenueTimeFinished(res.eventDate, res.endTime);
+                  const isProcessed = res.status === 'Completed' || res.status === 'No Occasion Found';
                   
                   return (
                       <motion.div 
@@ -139,61 +133,83 @@ const Reservations = () => {
                           layout
                           className={clsx(
                               "bg-white rounded-[1.5rem] md:rounded-[2.5rem] p-6 border border-gray-100 shadow-sm transition-all duration-500",
-                              isInactive ? "opacity-60 grayscale-[0.2]" : "hover:shadow-2xl hover:shadow-gray-200/40 hover:-translate-y-1"
+                              (finished && !isProcessed) ? "opacity-60" : "hover:shadow-2xl hover:shadow-gray-200/40"
                           )}
                       >
                           <div className="grid grid-cols-2 md:grid-cols-4 items-center gap-6">
                               {/* Status */}
                               <div className="flex items-center gap-4">
                                   <span className={clsx(
-                                      "px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border",
-                                      status === 'accepted' ? "bg-emerald-50 text-emerald-500 border-emerald-100" :
-                                      status === 'requested' ? "bg-white text-gray-400 border-gray-100" :
-                                      status === 'completed' ? "bg-gray-50 text-gray-400 border-gray-100" :
-                                      "bg-rose-50 text-rose-500 border-rose-100"
+                                      "px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border whitespace-nowrap",
+                                      getStatusStyle(res.status)
                                   )}>
-                                      {status}
+                                      {res.status}
                                   </span>
                               </div>
 
-                              {/* Start DateTime */}
-                              <div className="text-[11px] font-bold text-gray-800">
-                                  {new Date(res.date || res.eventDate).toLocaleDateString()}
-                                  <br />
-                                  <span className="text-gray-400">{res.startTime || '11:00'}</span>
+                              {/* DateTime */}
+                              <div className="text-[11px] font-bold text-gray-800 flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                                      <FiCalendar size={14} />
+                                  </div>
+                                  <div>
+                                    {format(new Date(res.eventDate), 'MMM dd, yyyy')}
+                                    <div className="text-[10px] text-gray-400 font-medium">{res.startTime} - {res.endTime}</div>
+                                  </div>
                               </div>
 
-                              {/* End DateTime */}
-                              <div className="hidden md:block text-[11px] font-bold text-gray-800">
-                                  {new Date(res.date || res.eventDate).toLocaleDateString()}
-                                  <br />
-                                  <span className="text-gray-400">{res.endTime || '14:00'}</span>
+                              {/* Customer */}
+                              <div className="hidden md:block">
+                                  <p className="text-[11px] font-black text-gray-800 uppercase truncate">{res.fullName}</p>
+                                  <p className="text-[10px] text-gray-400 font-bold">{res.phone}</p>
                               </div>
 
                               {/* Actions */}
-                              <div className="flex items-center justify-end gap-2 md:gap-6 md:pr-4">
-                                  {status === 'requested' && (
+                              <div className="flex items-center justify-end gap-4">
+                                  {filter === 'Active' && !finished && (
                                       <div className="flex items-center gap-3">
-                                          <button 
-                                              onClick={() => setModalData({ id: res._id, type: 'accept' })}
-                                              className="text-[10px] font-black uppercase tracking-widest text-emerald-500 hover:text-emerald-600 transition-colors"
-                                          >
-                                              Approve
-                                          </button>
+                                          {res.status !== 'Confirmed' && (
+                                              <button 
+                                                  onClick={() => setModalData({ id: res._id, type: 'accept' })}
+                                                  className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all shadow-sm"
+                                              >
+                                                  <FiCheck size={18} />
+                                              </button>
+                                          )}
                                           <button 
                                               onClick={() => setModalData({ id: res._id, type: 'reject' })}
-                                              className="text-[10px] font-black uppercase tracking-widest text-rose-500 hover:text-rose-600 transition-colors"
+                                              className="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shadow-sm"
                                           >
-                                              Reject
+                                              <FiX size={18} />
                                           </button>
                                       </div>
                                   )}
-                                  <div 
-                                      onClick={() => toggleRow(res._id)}
-                                      className="flex items-center gap-2 text-[10px] font-black text-gray-300 uppercase cursor-pointer hover:text-gray-800 transition-colors shrink-0"
+
+                                  {filter === 'Inactive' && finished && !isProcessed && (
+                                      <div className="flex items-center gap-3">
+                                          <button 
+                                              onClick={() => handleStatusUpdate(res._id, 'Completed', 'Paid')}
+                                              className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all shadow-sm"
+                                              title="Done (Completed & Paid)"
+                                          >
+                                              <FiCheck size={18} />
+                                          </button>
+                                          <button 
+                                              onClick={() => handleStatusUpdate(res._id, 'No Occasion Found')}
+                                              className="w-10 h-10 rounded-xl bg-gray-50 text-gray-500 flex items-center justify-center hover:bg-gray-500 hover:text-white transition-all shadow-sm"
+                                              title="Not Done (No Occasion Found)"
+                                          >
+                                              <FiX size={18} />
+                                          </button>
+                                      </div>
+                                  )}
+
+                                  <button 
+                                      onClick={() => setExpandedId(expandedId === res._id ? null : res._id)}
+                                      className="text-[10px] font-black text-gray-300 uppercase hover:text-gray-800 transition-colors"
                                   >
-                                      More {expandedId === res._id ? <FiChevronUp /> : <FiChevronDown />}
-                                  </div>
+                                      {expandedId === res._id ? 'Close' : 'Details'}
+                                  </button>
                               </div>
                           </div>
 
@@ -209,27 +225,27 @@ const Reservations = () => {
                                       <div className="mt-8 pt-8 border-t border-gray-50 grid grid-cols-1 md:grid-cols-3 gap-8">
                                           <div className="space-y-3">
                                               <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Customer Info</p>
-                                              <p className="text-xs font-bold text-gray-700">{res.fullName || res.customerName || 'Anonymous'}</p>
-                                              <p className="text-[11px] text-gray-400 font-medium">{res.phone || res.customerPhone || 'N/A'}</p>
-                                              <p className="text-[11px] text-gray-400 font-medium">{res.email || 'No Email'}</p>
+                                              <p className="text-xs font-bold text-gray-700">{res.fullName}</p>
+                                              <p className="text-[11px] text-gray-400 font-medium">{res.phone}</p>
+                                              <p className="text-[11px] text-gray-400 font-medium">{res.email}</p>
                                           </div>
                                           
                                           <div className="space-y-3">
                                               <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Booking Context</p>
-                                              <p className="text-xs font-bold text-gray-700">Type: <span className="font-medium">{res.reservationType || 'Normal Party'}</span></p>
-                                              <p className="text-xs font-bold text-gray-700">Party Size: <span className="font-medium">{res.partySize || res.guests || '02'}</span></p>
-                                              <p className="text-xs font-bold text-gray-700">Table: <span className="font-medium text-orange-500">{res.tableNo || res.tables || '#01'}</span></p>
+                                              <p className="text-xs font-bold text-gray-700">Type: <span className="font-medium">{res.reservationType}</span></p>
+                                              <p className="text-xs font-bold text-gray-700">Guests: <span className="font-medium">{res.guests}</span></p>
+                                              <p className="text-xs font-bold text-gray-700">Venue: <span className="font-medium text-[#8B3B3B]">{res.venueDetails || 'Hall'}</span></p>
                                           </div>
 
                                           <div className="space-y-3">
-                                              <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Special Notes</p>
+                                              <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Requirements</p>
                                               <p className="text-xs text-gray-500 font-medium leading-relaxed italic">
-                                                "{res.specialRequirements || 'Flat 0% OFF on Total Bill'}"
+                                                "{res.specialRequirements || 'No special requirements'}"
                                               </p>
-                                              {res.adminMessage && (
+                                              {res.messageToUser && (
                                                 <div className="mt-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                                    <p className="text-[9px] font-black text-gray-400 uppercase mb-1">Admin Note</p>
-                                                    <p className="text-[10px] text-gray-600 font-medium italic">{res.adminMessage}</p>
+                                                    <p className="text-[9px] font-black text-gray-400 uppercase mb-1">Message Sent</p>
+                                                    <p className="text-[10px] text-gray-600 font-medium italic">{res.messageToUser}</p>
                                                 </div>
                                               )}
                                           </div>
@@ -283,7 +299,7 @@ const Reservations = () => {
                               Cancel
                           </button>
                           <button 
-                              onClick={handleStatusUpdate}
+                              onClick={() => handleStatusUpdate()}
                               disabled={actionLoading}
                               className={clsx(
                                   "py-4 rounded-2xl text-white font-black text-[10px] uppercase tracking-widest shadow-xl transition-all flex items-center justify-center gap-2",
@@ -300,7 +316,7 @@ const Reservations = () => {
 
       {currentList.length === 0 && (
           <div className="py-20 text-center">
-              <p className="text-gray-300 font-black uppercase tracking-widest text-sm">No reservations found in this section</p>
+              <p className="text-gray-400 font-black uppercase tracking-widest text-sm">No reservations found</p>
           </div>
       )}
     </div>
@@ -308,3 +324,4 @@ const Reservations = () => {
 };
 
 export default Reservations;
+

@@ -2,8 +2,11 @@ import { create } from 'zustand';
 import axiosInstance from '../api/axiosInstance';
 
 const useAdminStore = create((set, get) => ({
-  activeTab: 'dashboard',
-  setActiveTab: (tab) => set({ activeTab: tab }),
+  activeTab: localStorage.getItem('adminActiveTab') || 'dashboard',
+  setActiveTab: (tab) => {
+    localStorage.setItem('adminActiveTab', tab);
+    set({ activeTab: tab });
+  },
   
   stats: {
     totalOrders: 0,
@@ -26,6 +29,7 @@ const useAdminStore = create((set, get) => ({
   reservations: [],
   profile: null,
   loading: false,
+  newNotification: null,
 
   fetchProfile: async () => {
     try {
@@ -67,9 +71,9 @@ const useAdminStore = create((set, get) => ({
         const reservations = resvRes.data || [];
 
         const totalOrders = orders.length;
-        const completeOrders = orders.filter(o => o.status === 'complete' || o.status === 'delivered').length;
+        const completeOrders = orders.filter(o => o.status === 'completed' || o.status === 'delivered').length;
         const cancelledOrders = orders.filter(o => o.status === 'cancelled').length;
-        const pendingOrders = orders.filter(o => o.status === 'pending' || o.status === 'processing').length;
+        const pendingOrders = orders.filter(o => o.status === 'pending' || o.status === 'processing' || o.status === 'requested').length;
         const totalRevenue = orders.reduce((acc, order) => acc + (order.totalAmount || 0), 0);
 
         set({
@@ -108,9 +112,9 @@ const useAdminStore = create((set, get) => ({
     }
   },
 
-  updateOrderStatus: async (id, status) => {
+  updateOrderStatus: async (id, data) => {
     try {
-        await axiosInstance.put(`/orders/${id}`, { status });
+        await axiosInstance.put(`/orders/${id}`, data);
         get().fetchStats(); // Refresh everything
     } catch (error) {
         console.error('Error updating order status:', error);
@@ -212,6 +216,11 @@ const useAdminStore = create((set, get) => ({
             }
         }));
         console.log('New Reservation Received:', reservation);
+    });
+
+    socket.on('new_notification', (notification) => {
+        set({ newNotification: notification });
+        setTimeout(() => set({ newNotification: null }), 10000);
     });
 
     socket.on('online_count', (count) => {

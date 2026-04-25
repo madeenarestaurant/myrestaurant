@@ -15,6 +15,7 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 const visitorRoutes = require('./routes/visitorRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 connectDB();
 
@@ -51,6 +52,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/visitors', visitorRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Socket.io for Live Visitors
 io.on('connection', (socket) => {

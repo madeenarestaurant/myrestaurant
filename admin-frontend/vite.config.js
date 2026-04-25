@@ -9,6 +9,6 @@ export default defineConfig({
     tailwindcss(),
   ],
   optimizeDeps: {
-    include: ['react-icons/lu'],
+    include: ['react-icons/lu', 'date-fns'],
   },
 })

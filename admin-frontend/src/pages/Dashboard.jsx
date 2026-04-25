@@ -1,21 +1,20 @@
 import React, { useEffect } from 'react';
 import StatsCard from '../components/dashboard/StatsCard';
 import { 
-  FiBox, 
   FiShoppingCart, 
-  FiAlertCircle, 
-  FiClock, 
   FiActivity, 
-  FiSearch, 
-  FiMic, 
+  FiClock, 
   FiMoreVertical,
-  FiCheckCircle,
   FiCalendar,
-  FiUser
+  FiUser,
+  FiShoppingBag,
+  FiTrendingUp,
+  FiUsers
 } from 'react-icons/fi';
 import useAdminStore from '../store/useAdminStore';
 import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
+import { format } from 'date-fns'; // re-scan
 
 const Dashboard = () => {
   const { stats, recentOrders, reservations, fetchStats, loading } = useAdminStore();
@@ -26,135 +25,176 @@ const Dashboard = () => {
 
   const formatCurrency = (val) => `₹${val?.toLocaleString()}`;
 
+  // Calculate today's orders
+  const today = new Date().toDateString();
+  const todayOrders = (recentOrders || []).filter(o => new Date(o.createdAt).toDateString() === today);
+
   return (
     <div className="space-y-6 md:space-y-8 pb-10">
-      {/* Stats Cards - Responsive 2x2 on mobile */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <StatsCard 
-          title="Total revenue" 
+          title="Total Revenue" 
           value={formatCurrency(stats.totalRevenue)} 
-          icon={FiActivity} 
-          trend={14.5}
+          icon={FiTrendingUp} 
+          trend={12.4}
           positive={true}
         />
         <StatsCard 
-          title="Total order" 
+          title="Total Orders" 
           value={stats.totalOrders} 
-          icon={FiShoppingCart} 
-          trend={14.5}
+          icon={FiShoppingBag} 
+          trend={8.2}
           positive={true}
         />
         <StatsCard 
-          title="Total visitors" 
+          title="Total Visitors" 
           value={stats.totalVisitors} 
-          icon={FiUser} 
-          trend={14.5}
+          icon={FiUsers} 
+          trend={24.1}
           positive={true}
         />
         <StatsCard 
-          title="Online Visitors" 
+          title="Live Visitors" 
           value={stats.onlineVisitors} 
           icon={FiActivity} 
           trend={0}
           positive={true}
         />
-
       </div>
 
-      {/* Analytics Chart - Kept as requested previously */}
-      <div className="bg-white rounded-[2rem] p-6 md:p-8 border border-gray-100 shadow-sm relative overflow-hidden">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 md:mb-10 relative z-10">
-                <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    Order Analytics
-                </h3>
-                <div className="flex items-center gap-4 md:gap-6 w-full md:w-auto overflow-x-auto no-scrollbar pb-2 md:pb-0">
-                    <div className="flex items-center gap-2 whitespace-nowrap">
-                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                        <span className="text-[10px] font-black text-gray-400 uppercase">online</span>
+      {/* Analytics Chart Section */}
+      <div className="bg-white rounded-[2.5rem] p-6 md:p-10 border border-gray-100 shadow-sm relative overflow-hidden group">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 relative z-10">
+                <div>
+                    <h3 className="text-xl font-black text-gray-800 tracking-tight">Order Analytics</h3>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Monthly performance review</p>
+                </div>
+                <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/20" />
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Revenue</span>
                     </div>
-                    <div className="flex items-center gap-2 whitespace-nowrap">
-                        <div className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                        <span className="text-[10px] font-black text-gray-400 uppercase">offline</span>
-                    </div>
-                    <div className="px-4 py-1.5 bg-gray-50 rounded-xl text-[10px] font-black uppercase text-gray-400 border border-gray-100 flex items-center gap-2 cursor-pointer whitespace-nowrap">
-                        years <FiClock />
+                    <div className="flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-lg shadow-rose-500/20" />
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Expenses</span>
                     </div>
                 </div>
             </div>
 
-            <div className="h-[250px] md:h-[300px] relative">
+            <div className="h-[250px] md:h-[320px] relative">
                 <svg className="w-full h-full" viewBox="0 0 1000 300" preserveAspectRatio="none">
                     {[0, 1, 2, 3, 4, 5].map(v => (
-                        <line key={v} x1="0" y1={v * 60} x2="1000" y2={v * 60} stroke="#f8f8f8" strokeWidth="1.5" />
+                        <line key={v} x1="0" y1={v * 60} x2="1000" y2={v * 60} stroke="#f8f8f8" strokeWidth="1" />
                     ))}
-                    <path d="M0,220 C150,150 250,250 400,200 C550,150 750,50 1000,180" fill="none" stroke="#10B981" strokeWidth="4" strokeLinecap="round" className="drop-shadow-lg" />
-                    <path d="M0,150 C200,160 300,280 500,180 C700,80 850,220 1000,200" fill="none" stroke="#EF4444" strokeWidth="4" strokeLinecap="round" className="drop-shadow-lg" />
+                    <motion.path 
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ duration: 2, ease: "easeInOut" }}
+                        d="M0,220 C150,150 250,250 400,200 C550,150 750,50 1000,180" 
+                        fill="none" 
+                        stroke="#10B981" 
+                        strokeWidth="5" 
+                        strokeLinecap="round" 
+                    />
+                    <motion.path 
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ duration: 2, ease: "easeInOut", delay: 0.5 }}
+                        d="M0,150 C200,160 300,280 500,180 C700,80 850,220 1000,200" 
+                        fill="none" 
+                        stroke="#EF4444" 
+                        strokeWidth="5" 
+                        strokeLinecap="round" 
+                    />
                 </svg>
-                <div className="flex justify-between mt-6 px-1 text-[9px] md:text-[10px] font-black text-gray-300 uppercase tracking-widest">
-                    {['jan','feb','mar','apr','may','jun','jul','aud','sep','oct','nov','dec'].map(m => <span key={m}>{m}</span>)}
+                <div className="flex justify-between mt-8 px-2 text-[9px] font-black text-gray-300 uppercase tracking-[0.2em]">
+                    {['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'].map(m => <span key={m}>{m}</span>)}
                 </div>
             </div>
       </div>
 
-      {/* New Four-Section Layout */}
+      {/* Grid Layout for Detailed Sections */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-          {/* Today Order */}
-          <section className="bg-white rounded-[2rem] border border-gray-100 shadow-sm p-6 overflow-hidden">
-                <div className="flex justify-between items-center mb-6">
-                    <h4 className="text-base font-bold text-gray-800">Today Order</h4>
+          
+          {/* Today's Orders */}
+          <section className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm p-8 flex flex-col h-[500px]">
+                <div className="flex justify-between items-center mb-8">
+                    <div>
+                        <h4 className="text-base font-black text-gray-800 uppercase tracking-tight">Today's Activity</h4>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{todayOrders.length} orders received today</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-300">
+                        <FiShoppingBag size={18} />
+                    </div>
                 </div>
-                <div className="space-y-4">
-                    {[
-                      { name: 'veg salad', time: '9:00 am', price: 250, img: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=100' },
-                      { name: 'chicken pizza', time: '10:00 am', price: 300, img: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=100' },
-                      { name: 'chicken biriyani', time: '11:00 am', price: 160, img: 'https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?w=100' }
-                    ].map((order, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-all border border-transparent hover:border-gray-100/50">
-                          <div className="flex items-center gap-4">
-                              <img src={order.img} alt={order.name} className="w-14 h-12 md:w-16 md:h-14 object-cover rounded-xl" />
-                              <div>
-                                  <p className="font-bold text-sm text-gray-800">{order.name}</p>
-                                  <p className="text-[10px] font-medium text-gray-400 mt-0.5">{order.time}</p>
-                              </div>
-                          </div>
-                          <span className="font-bold text-sm text-gray-800">₹{order.price}</span>
-                      </div>
-                    ))}
+                <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2">
+                    {todayOrders.length === 0 ? (
+                        <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
+                            <FiShoppingBag size={48} className="mb-4" />
+                            <p className="text-xs font-black uppercase tracking-widest">No orders yet today</p>
+                        </div>
+                    ) : (
+                        todayOrders.map((order) => (
+                            <div key={order._id} className="flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-50 rounded-[1.5rem] transition-all group">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-[#8B3B3B] group-hover:scale-110 transition-transform">
+                                        <FiShoppingCart size={20} />
+                                    </div>
+                                    <div>
+                                        <p className="font-black text-sm text-gray-800 truncate max-w-[150px]">{order.customerName || 'Walk-in'}</p>
+                                        <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">{format(new Date(order.createdAt), 'hh:mm a')}</p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className="font-black text-sm text-gray-800">{formatCurrency(order.totalAmount)}</p>
+                                    <span className={clsx(
+                                        "text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded",
+                                        order.status === 'requested' ? "text-amber-500" : "text-emerald-500"
+                                    )}>{order.status}</span>
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </div>
           </section>
 
-          {/* Reservation */}
-          <section className="bg-white rounded-[2rem] border border-gray-100 shadow-sm p-6 overflow-hidden">
-                <div className="flex justify-between items-center mb-6">
-                    <h4 className="text-base font-bold text-gray-800">Reservation</h4>
-                    <FiMoreVertical className="text-gray-300" />
+          {/* Recent Reservations */}
+          <section className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm p-8 flex flex-col h-[500px]">
+                <div className="flex justify-between items-center mb-8">
+                    <div>
+                        <h4 className="text-base font-black text-gray-800 uppercase tracking-tight">Recent Reservations</h4>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Latest booking requests</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-300">
+                        <FiCalendar size={18} />
+                    </div>
                 </div>
-                <div className="overflow-x-auto -mx-6 px-6">
-                    <table className="w-full text-[11px] font-medium">
-                        <thead>
+                <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
+                    <table className="w-full text-[11px]">
+                        <thead className="sticky top-0 bg-white z-10">
                             <tr className="text-gray-400 border-b border-gray-50">
-                                <th className="text-left pb-3 font-medium">Name</th>
-                                <th className="text-left pb-3 font-medium">contact</th>
-                                <th className="text-left pb-3 font-medium">table</th>
-                                <th className="text-left pb-3 font-medium">Date</th>
-                                <th className="text-left pb-3 font-medium">person</th>
-                                <th className="text-right pb-3 font-medium">request</th>
+                                <th className="text-left pb-4 font-black uppercase tracking-widest">Customer</th>
+                                <th className="text-left pb-4 font-black uppercase tracking-widest">Date</th>
+                                <th className="text-left pb-4 font-black uppercase tracking-widest">Party</th>
+                                <th className="text-right pb-4 font-black uppercase tracking-widest">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50/50">
-                            {(reservations?.length > 0 ? reservations.slice(0, 4) : [{name:'stephy',phone:'12345678',table:'01',date:'12-4-2026',persons:'04',status:'Accept'}]).map((resv, i) => (
-                                <tr key={i}>
-                                    <td className="py-4 text-gray-700">{resv.name || resv.customerName}</td>
-                                    <td className="py-4 text-gray-400">{resv.phone || resv.customerPhone || '12345678'}</td>
-                                    <td className="py-4 text-gray-400">{resv.tableNo || '01'}</td>
-                                    <td className="py-4 text-gray-400">{resv.date || '12-4-2026'}</td>
-                                    <td className="py-4 text-gray-400">{resv.persons || '02'}</td>
+                            {reservations.slice(0, 8).map((resv) => (
+                                <tr key={resv._id} className="group hover:bg-gray-50/50 transition-colors">
+                                    <td className="py-4">
+                                        <p className="font-black text-gray-800">{resv.fullName}</p>
+                                        <p className="text-[9px] text-gray-400 font-bold">{resv.phone}</p>
+                                    </td>
+                                    <td className="py-4 text-gray-500 font-bold">{format(new Date(resv.eventDate), 'MMM dd')}</td>
+                                    <td className="py-4 text-gray-500 font-bold">{resv.guests} Pax</td>
                                     <td className="py-4 text-right">
                                         <span className={clsx(
-                                            "px-2 py-0.5 rounded text-[9px] font-bold transition-colors",
-                                            i % 3 === 1 ? "bg-orange-50 text-orange-400" : "bg-emerald-50 text-emerald-500"
+                                            "px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest",
+                                            resv.status === 'Confirmed' ? "bg-emerald-50 text-emerald-500" : "bg-amber-50 text-amber-500"
                                         )}>
-                                            {i % 3 === 1 ? 'Pending' : 'Accept'}
+                                            {resv.status}
                                         </span>
                                     </td>
                                 </tr>
@@ -164,81 +204,47 @@ const Dashboard = () => {
                 </div>
           </section>
 
-          {/* Order List */}
-          <section className="bg-white rounded-[2rem] border border-gray-100 shadow-sm p-6 overflow-hidden">
-                <div className="flex justify-between items-center mb-6">
-                    <h4 className="text-base font-bold text-gray-800">Order List</h4>
-                    <FiMoreVertical className="text-gray-300" />
+          {/* Full Order List (Summary) */}
+          <section className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm p-8 flex flex-col h-[500px] lg:col-span-2">
+                <div className="flex justify-between items-center mb-8">
+                    <div>
+                        <h4 className="text-base font-black text-gray-800 uppercase tracking-tight">System Transaction Log</h4>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Live feed of all orders</p>
+                    </div>
                 </div>
-                <div className="overflow-x-auto -mx-6 px-6">
-                    <table className="w-full text-[11px] font-medium">
-                        <thead>
+                <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
+                    <table className="w-full text-[11px]">
+                        <thead className="sticky top-0 bg-white z-10">
                             <tr className="text-gray-400 border-b border-gray-50">
-                                <th className="text-left pb-3 font-medium">product name</th>
-                                <th className="text-left pb-3 font-medium">product id</th>
-                                <th className="text-left pb-3 font-medium">price</th>
-                                <th className="text-left pb-3 font-medium">date</th>
-                                <th className="text-left pb-3 font-medium">status</th>
-                                <th className="text-right pb-3 font-medium">quantity</th>
+                                <th className="text-left pb-4 font-black uppercase tracking-widest">Order ID</th>
+                                <th className="text-left pb-4 font-black uppercase tracking-widest">Customer</th>
+                                <th className="text-left pb-4 font-black uppercase tracking-widest">Items</th>
+                                <th className="text-left pb-4 font-black uppercase tracking-widest">Amount</th>
+                                <th className="text-left pb-4 font-black uppercase tracking-widest">Time</th>
+                                <th className="text-right pb-4 font-black uppercase tracking-widest">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50/50">
-                            {(recentOrders?.length > 0 ? recentOrders.slice(0, 4) : [{name:'chicken biriyani',id:'378736728',price:587,date:'11-4-2026',status:'complete',qty:10}]).map((order, i) => (
-                                <tr key={i}>
-                                    <td className="py-4 text-gray-700">{order.items?.[0]?.name || order.name || 'Chicken Biriyani'}</td>
-                                    <td className="py-4 text-gray-400">{order._id?.slice(-8) || order.id || '378736728'}</td>
-                                    <td className="py-4 text-gray-700">₹{order.totalAmount || order.price || 587}</td>
-                                    <td className="py-4 text-gray-400">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : (order.date || '11-4-2026')}</td>
-                                    <td className="py-4">
+                            {recentOrders.slice(0, 15).map((order) => (
+                                <tr key={order._id} className="hover:bg-gray-50/50 transition-colors">
+                                    <td className="py-4 text-gray-400 font-bold">#{order._id?.slice(-8)}</td>
+                                    <td className="py-4 text-gray-800 font-black">{order.customerName || 'Walk-in'}</td>
+                                    <td className="py-4 text-gray-500 font-bold">{order.items?.length || 0} items</td>
+                                    <td className="py-4 text-gray-800 font-black">{formatCurrency(order.totalAmount)}</td>
+                                    <td className="py-4 text-gray-400 font-bold">{format(new Date(order.createdAt), 'MMM dd, hh:mm a')}</td>
+                                    <td className="py-4 text-right">
                                         <span className={clsx(
-                                            "px-2 py-0.5 rounded text-[9px] font-bold",
-                                            i % 3 === 2 ? "bg-orange-50 text-orange-400" : "bg-emerald-50 text-emerald-500"
+                                            "px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest",
+                                            order.status === 'completed' ? "bg-emerald-50 text-emerald-500" : 
+                                            order.status === 'requested' ? "bg-amber-50 text-amber-500" : "bg-rose-50 text-rose-500"
                                         )}>
-                                            {i % 3 === 2 ? 'pending' : 'complete'}
+                                            {order.status}
                                         </span>
                                     </td>
-                                    <td className="py-4 text-right text-gray-700">{order.items?.reduce((a, b) => a + b.quantity, 0) || order.qty || 10}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                </div>
-          </section>
-
-          {/* Employees Activity */}
-          <section className="bg-white rounded-[2rem] border border-gray-100 shadow-sm p-6 overflow-hidden flex flex-col">
-                <div className="flex justify-between items-center mb-10">
-                    <h4 className="text-base font-bold text-gray-800">Employees Activity</h4>
-                </div>
-                
-                <div className="flex-1 flex flex-col items-center justify-center py-6">
-                    <div className="relative w-48 h-48 md:w-56 md:h-56">
-                        {/* CSS-only Donut Chart */}
-                        <svg className="w-full h-full transform -rotate-90">
-                            <circle cx="50%" cy="50%" r="40%" stroke="#e2e8f0" strokeWidth="25" fill="none" />
-                            <circle cx="50%" cy="50%" r="40%" stroke="#8B5CF6" strokeWidth="28" fill="none" strokeDasharray="251 251" strokeDashoffset="50" strokeLinecap="round" className="drop-shadow-sm" />
-                            <circle cx="50%" cy="50%" r="40%" stroke="#F97316" strokeWidth="28" fill="none" strokeDasharray="251 251" strokeDashoffset="180" strokeLinecap="round" />
-                            <circle cx="50%" cy="50%" r="40%" stroke="#22C55E" strokeWidth="28" fill="none" strokeDasharray="251 251" strokeDashoffset="210" strokeLinecap="round" />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-3xl md:text-4xl font-bold text-indigo-400">80%</span>
-                        </div>
-                    </div>
-
-                    <div className="mt-10 flex items-center justify-center gap-6">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                            <span className="text-[10px] font-bold text-gray-500">Active</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 rounded-full bg-orange-500" />
-                            <span className="text-[10px] font-bold text-gray-500">Inactive</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
-                            <span className="text-[10px] font-bold text-gray-500">New sign</span>
-                        </div>
-                    </div>
                 </div>
           </section>
       </div>
@@ -247,3 +253,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
