@@ -51,17 +51,37 @@ exports.createOrder = async (req, res) => {
         // Send confirmation email to user
         if (email) {
             const subject = 'Order Received - Madeena Restaurant';
+            
+            const modeMessages = {
+                'dine-in': "Please find a comfortable table. Our staff will serve you shortly at your table.",
+                'take-away': "Your order is being packed. We'll notify you when it's ready for pickup.",
+                'delivery': "Sit back and relax! Our delivery partner will be at your doorstep soon."
+            };
+
             const html = `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px;">
-                    <h2 style="color: #333;">Order Received!</h2>
-                    <p>Hi ${customerName || 'Customer'},</p>
-                    <p>Thank you for your order. Your request has been received and is waiting for confirmation.</p>
-                    <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                        <p style="margin: 0; font-size: 18px;"><strong>Unique Token:</strong> <span style="color: #e67e22; font-size: 24px;">${token}</span></p>
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; background-color: #ffffff;">
+                    <div style="text-align: center; padding-bottom: 20px;">
+                        <h2 style="color: #8C231F; margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">Order Confirmed</h2>
+                        <p style="color: #666; font-size: 12px; margin-top: 5px;">Thank you for choosing Madeena Restaurant</p>
                     </div>
-                    <p>Please wait for further updates on your order status.</p>
-                    <hr>
-                    <p style="font-size: 12px; color: #888;">Madeena Restaurant Team</p>
+                    
+                    <div style="background: #fdfdfd; border: 1px solid #f0f0f0; padding: 20px; border-radius: 15px; margin: 20px 0; text-align: center;">
+                        <p style="margin: 0; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px;">Your Order Token</p>
+                        <h1 style="margin: 10px 0; font-size: 48px; color: #333; letter-spacing: -2px;">${token}</h1>
+                        <p style="margin: 0; font-size: 14px; color: #555; font-weight: bold;">${modeMessages[mode] || "Your delicacy is being prepared."}</p>
+                    </div>
+
+                    <div style="color: #444; line-height: 1.6; font-size: 14px;">
+                        <p>Hi <strong>${customerName || 'Valued Guest'}</strong>,</p>
+                        <p>We've received your request and our chefs have started preparing your selection. We'll keep you updated on the status.</p>
+                    </div>
+
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
+                    
+                    <div style="text-align: center; font-size: 12px; color: #999;">
+                        <p style="margin: 0;">Madeena Restaurant & Cafe</p>
+                        <p style="margin: 5px 0;">Salalah, Oman</p>
+                    </div>
                 </div>
             `;
             try {
