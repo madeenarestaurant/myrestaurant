@@ -7,9 +7,14 @@ const connectDB = require('./config/db');
 const http = require('http');
 const socketIo = require('socket.io');
 const Visitor = require('./models/Visitor');
-const allowedOrigins = process.env.CLIENT_URLS
-  ? process.env.CLIENT_URLS.split(',')
-  : [];
+const allowedOrigins = [
+  'https://madeenarestaurant.com',
+  'https://admin.madeenarestaurant.com'
+  // 'http://localhost:5173',
+  // 'http://localhost:5174',
+  // 'http://localhost:5175',
+  // 'http://localhost:8080'
+];
 
 
 // Route imports
