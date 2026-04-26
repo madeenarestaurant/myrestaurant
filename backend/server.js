@@ -7,6 +7,10 @@ const connectDB = require('./config/db');
 const http = require('http');
 const socketIo = require('socket.io');
 const Visitor = require('./models/Visitor');
+const allowedOrigins = process.env.CLIENT_URLS
+  ? process.env.CLIENT_URLS.split(',')
+  : [];
+
 
 // Route imports
 const adminRoutes = require('./routes/adminRoutes');
@@ -23,21 +27,27 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
 app.use(cors({
-  origin: [
-    'http://localhost:5001', 
-    'http://localhost:5173', 
-    'http://localhost:5174', 
-    'http://localhost:5175'
-  ],
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS blocked: " + origin));
+    }
+  },
   credentials: true
 }));
+
 app.use(express.json());
+
 
 // Middleware to attach io to req
 app.use((req, res, next) => {
@@ -74,7 +84,7 @@ app.get('/', (req, res) => {
   res.send('Madeena Restaurant API is running...');
 });
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 8080;
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
