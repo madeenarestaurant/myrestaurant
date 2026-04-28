@@ -19,7 +19,7 @@ const AdminLayout = () => {
   const { activeTab, initSocket } = useAdminStore();
 
   useEffect(() => {
-    const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://madeena-api.madeenarestaurant.com';
+    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
     const socketUrl = apiBase.endsWith('/api') ? apiBase.replace('/api', '') : apiBase;
     
     const socket = io(socketUrl);

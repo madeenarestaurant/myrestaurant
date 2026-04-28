@@ -9,11 +9,11 @@ const socketIo = require('socket.io');
 const Visitor = require('./models/Visitor');
 const allowedOrigins = [
   'https://madeenarestaurant.com',
-  'https://admin.madeenarestaurant.com'
-  // 'http://localhost:5173',
-  // 'http://localhost:5174',
-  // 'http://localhost:5175',
-  // 'http://localhost:8080'
+  'https://admin.madeenarestaurant.com',
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175',
+  'http://localhost:8080'
 ];
 
 

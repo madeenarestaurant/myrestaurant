@@ -3,8 +3,11 @@ import { io } from 'socket.io-client';
 import { UAParser } from 'ua-parser-js';
 import Cookies from 'js-cookie';
 
-const API_URL = 'https://madeena-api.madeenarestaurant.com/api/visitors';
-const SOCKET_URL = 'https://madeena-api.madeenarestaurant.com';
+// const API_URL = 'https://madeena-api.madeenarestaurant.com/api/visitors';
+// const SOCKET_URL = 'https://madeena-api.madeenarestaurant.com';
+
+const API_URL = 'http://localhost:8080/api/visitors';
+const SOCKET_URL = 'http://localhost:8080';
 
 class TrackingService {
   constructor() {
