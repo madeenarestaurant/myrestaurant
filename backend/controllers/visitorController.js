@@ -115,9 +115,19 @@ const getStats = async (req, res) => {
   }
 };
 
+const getAllVisitors = async (req, res) => {
+  try {
+    const visitors = await Visitor.find().sort({ lastVisit: -1 });
+    res.status(200).json(visitors);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch visitors" });
+  }
+};
+
 module.exports = {
   trackVisitor,
   updateTimeSpent,
   trackClick,
-  getStats
+  getStats,
+  getAllVisitors
 };

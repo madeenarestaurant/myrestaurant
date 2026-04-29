@@ -4,7 +4,7 @@ import {
   FiBox, 
   FiCreditCard, 
   FiLayers, 
-  FiSettings
+  FiUsers
 } from 'react-icons/fi';
 import useAdminStore from '../../store/useAdminStore';
 import { clsx } from 'clsx';
@@ -18,7 +18,7 @@ const MobileNav = () => {
     { id: 'orders', label: 'Order', icon: FiBox },
     { id: 'reservations', label: 'Reservation', icon: FiCreditCard },
     { id: 'products', label: 'Items', icon: FiLayers },
-    { id: 'settings', label: 'settings', icon: FiSettings },
+    { id: 'visitors', label: 'Visitors', icon: FiUsers },
   ];
 
   return (

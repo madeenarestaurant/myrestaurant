@@ -9,6 +9,7 @@ import Reservations from '../pages/Reservations';
 import Settings from '../pages/Settings';
 import Profile from '../pages/Profile';
 import Notifications from '../pages/Notifications';
+import Visitors from '../pages/Visitors';
 import useAdminStore from '../store/useAdminStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -40,6 +41,7 @@ const AdminLayout = () => {
       case 'settings': return <Settings />;
       case 'profile': return <Profile />;
       case 'notifications': return <Notifications />;
+      case 'visitors': return <Visitors />;
       default: return <Dashboard />;
     }
   };

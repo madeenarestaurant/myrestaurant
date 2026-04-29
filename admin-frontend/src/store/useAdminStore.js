@@ -27,9 +27,19 @@ const useAdminStore = create((set, get) => ({
   categories: [],
   recentOrders: [],
   reservations: [],
+  visitors: [],
   profile: null,
   loading: false,
   newNotification: null,
+
+  fetchVisitors: async () => {
+    try {
+        const res = await axiosInstance.get('/visitors');
+        set({ visitors: res.data });
+    } catch (error) {
+        console.error('Error fetching visitors:', error);
+    }
+  },
 
   fetchProfile: async () => {
     try {

@@ -7,7 +7,8 @@ import {
   FiSettings,
   FiLogOut,
   FiCoffee,
-  FiBell
+  FiBell,
+  FiUsers
 } from 'react-icons/fi';
 import axiosInstance from '../../api/axiosInstance';
 import useAdminStore from '../../store/useAdminStore';
@@ -26,6 +27,7 @@ const Sidebar = () => {
     { id: 'dashboard', label: 'Dashboard', icon: FiGrid },
     { id: 'orders', label: 'Order', icon: FiBox },
     { id: 'reservations', label: 'Reservation', icon: FiCreditCard },
+    { id: 'visitors', label: 'Visitors', icon: FiUsers },
     { id: 'products', label: 'Items', icon: FiLayers },
     { id: 'notifications', label: 'Notifications', icon: FiBell },
     { id: 'settings', label: 'Settings', icon: FiSettings },
