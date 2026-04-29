@@ -31,6 +31,9 @@ const useAdminStore = create((set, get) => ({
   profile: null,
   loading: false,
   newNotification: null,
+  sessionExpired: false,
+
+  setSessionExpired: (status) => set({ sessionExpired: status }),
 
   fetchVisitors: async () => {
     try {

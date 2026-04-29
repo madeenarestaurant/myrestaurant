@@ -2,6 +2,7 @@ import React from 'react';
 import Sidebar from '../components/common/Sidebar';
 import MobileNav from '../components/common/MobileNav';
 import Header from '../components/common/Header';
+import SessionTimeoutModal from '../components/common/SessionTimeoutModal';
 import Dashboard from '../pages/Dashboard';
 import Orders from '../pages/Orders';
 import Products from '../pages/Products';
@@ -19,7 +20,7 @@ const AdminLayout = () => {
   const { activeTab, initSocket } = useAdminStore();
 
   useEffect(() => {
-    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://:8080';
+    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
     const socketUrl = apiBase.endsWith('/api') ? apiBase.replace('/api', '') : apiBase;
 
     const socket = io(socketUrl);
@@ -75,6 +76,7 @@ const AdminLayout = () => {
 
         {/* Bottom Nav for Mobile */}
         <MobileNav />
+        <SessionTimeoutModal />
       </div>
     </div>
   );
