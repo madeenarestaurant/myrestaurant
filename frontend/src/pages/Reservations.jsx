@@ -84,13 +84,46 @@ const Reservations = () => {
     } finally { setLoading(false); }
   };
 
+  const to12Hour = (time24) => {
+    if (!time24) return "";
+    const [h, m] = time24.split(":");
+    let hours = parseInt(h);
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12;
+    return `${hours}:${m} ${ampm}`;
+  };
+
   const submit = async () => {
     if (!emailVerified) return notify("Verify your email first.", true);
     if (!form.fullName.trim()) return notify("Full name is required.", true);
     if (!form.phone.trim()) return notify("Phone number is required.", true);
     if (!form.guests || form.guests < 1) return notify("Enter number of guests.", true);
     if (!form.startTime || !form.endTime) return notify("Select start and end time.", true);
-    if (form.startTime >= form.endTime) return notify("End time must be after start time.", true);
+    
+    // Time sequence validation
+    if (form.startTime >= form.endTime) {
+      return notify("End time must be after start time.", true);
+    }
+
+    // Current time validation (if date is today)
+    const today = new Date().toISOString().split("T")[0];
+    const selectedDate = form.eventDate.toISOString().split("T")[0];
+    if (selectedDate === today) {
+      const now = new Date();
+      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      if (form.startTime < currentTime) {
+        return notify("Start time cannot be in the past.", true);
+      }
+    }
+
+    // Overlap validation
+    const hasOverlap = occupiedSlots.some(slot => {
+      return (form.startTime < slot.endTime) && (slot.startTime < form.endTime);
+    });
+
+    if (hasOverlap) {
+      return notify("This time slot is already occupied. Please choose another time.", true);
+    }
 
     setLoading(true);
     try {
@@ -108,7 +141,7 @@ const Reservations = () => {
 
   // Build a human-readable occupied time summary for display
   const occupiedSummary = occupiedSlots.length
-    ? occupiedSlots.map((s) => `${s.startTime}–${s.endTime}`).join(", ")
+    ? occupiedSlots.map((s) => `${to12Hour(s.startTime)} – ${to12Hour(s.endTime)}`).join(", ")
     : null;
 
   const inputClass =
@@ -329,7 +362,7 @@ const Reservations = () => {
                   <div className="bg-black/40 rounded-2xl p-4 text-xs text-gray-400 space-y-1 border border-white/5">
                     <p><span className="text-gray-600">Name</span> · {form.fullName || "—"}</p>
                     <p><span className="text-gray-600">Date</span> · {form.eventDate.toDateString()}</p>
-                    <p><span className="text-gray-600">Time</span> · {form.startTime} – {form.endTime}</p>
+                    <p><span className="text-gray-600">Time</span> · {to12Hour(form.startTime)} – {to12Hour(form.endTime)}</p>
                     <p><span className="text-gray-600">Guests</span> · {form.guests}</p>
                     <p><span className="text-gray-600">Type</span> · {type}</p>
                   </div>

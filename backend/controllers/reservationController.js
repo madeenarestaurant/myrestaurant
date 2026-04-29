@@ -96,6 +96,24 @@ exports.createReservation = async (req, res) => {
       return res.status(400).json({ message: 'Email is not verified.' });
     }
 
+    // Check for overlaps with existing active reservations
+    const overlapping = await Reservation.findOne({
+      eventDate,
+      status: { $ne: 'Cancelled' },
+      $or: [
+        {
+          startTime: { $lt: endTime },
+          endTime: { $gt: startTime }
+        }
+      ]
+    });
+
+    if (overlapping) {
+      return res.status(400).json({ 
+        message: `This time slot (${startTime} - ${endTime}) overlaps with an existing reservation.` 
+      });
+    }
+
     const newReservation = new Reservation({
       fullName, email, phone, eventDate, startTime, endTime, 
       guests, reservationType: finalType, venueDetails, specialRequirements,
@@ -188,6 +206,15 @@ exports.updateReservation = async (req, res) => {
 
         await reservation.save();
 
+        const contactHtml = `
+            <div style="margin-top: 30px; padding: 20px; background-color: #f9f9f9; border-radius: 12px; border-left: 4px solid #8C231F; text-align: left;">
+                <p style="margin: 0 0 10px 0; font-weight: bold; color: #333; font-size: 14px;">Need to contact us?</p>
+                <p style="margin: 5px 0; color: #555; font-size: 13px;">📞 Phone: <strong>95945674</strong></p>
+                <p style="margin: 5px 0; color: #555; font-size: 13px;">📧 Email: <a href="mailto:madeenarestaurantoman@gmail.com" style="color: #8C231F; text-decoration: none;">madeenarestaurantoman@gmail.com</a></p>
+                <p style="margin: 5px 0; color: #555; font-size: 13px;">📍 Location: Ruwi, Near Badr Al Samaa Hospital, Muscat</p>
+            </div>
+        `;
+
         // If status changed to Confirmed, send acceptance email
         if (oldStatus !== 'Confirmed' && status === 'Confirmed') {
             const acceptanceMailOptions = {
@@ -196,19 +223,41 @@ exports.updateReservation = async (req, res) => {
                 subject: '🎉 Reservation Confirmed — Madeena Restaurant',
                 html: `
                     <div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:40px 30px;text-align:center;">
-                        <h2>Reservation Confirmed! 🎉</h2>
+                        <h2 style="color: #2e7d32;">Reservation Confirmed! 🎉</h2>
                         <p>Hi <strong>${reservation.fullName}</strong>, your hall reservation has been confirmed.</p>
                         <p>${messageToUser || 'We look forward to hosting you!'}</p>
-                        <div style="background:#f7f7f7;padding:20px;text-align:left;">
-                            <p>📅 <strong>${reservation.eventDate.toDateString()}</strong></p>
-                            <p>⏰ ${reservation.startTime} – ${reservation.endTime}</p>
-                            <p>👥 ${reservation.guests} Guests</p>
+                        <div style="background:#f7f7f7;padding:20px;text-align:left;border-radius:12px;margin-bottom:20px;">
+                            <p style="margin: 5px 0;">📅 <strong>${reservation.eventDate.toDateString()}</strong></p>
+                            <p style="margin: 5px 0;">⏰ ${reservation.startTime} – ${reservation.endTime}</p>
+                            <p style="margin: 5px 0;">👥 ${reservation.guests} Guests</p>
                         </div>
+                        ${contactHtml}
                     </div>
                 `
             };
             if (process.env.EMAIL_USER) {
                 await transporter.sendMail(acceptanceMailOptions);
+            }
+        }
+
+        // If status changed to Rejected, send rejection email
+        if (oldStatus !== 'Rejected' && status === 'Rejected') {
+            const rejectionMailOptions = {
+                from: `"Madeena Restaurant" <${process.env.EMAIL_USER}>`,
+                to: reservation.email,
+                subject: 'Reservation Update — Madeena Restaurant',
+                html: `
+                    <div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:40px 30px;text-align:center;">
+                        <h2 style="color: #c62828;">Reservation Update</h2>
+                        <p>Hi <strong>${reservation.fullName}</strong>, we regret to inform you that your reservation request for <strong>${reservation.eventDate.toDateString()}</strong> could not be accepted at this time.</p>
+                        <p style="color: #666; font-style: italic;">${messageToUser || 'Reason: Hall unavailable or already booked for this slot.'}</p>
+                        <p>If you have any questions or would like to reschedule, please feel free to reach out to us directly.</p>
+                        ${contactHtml}
+                    </div>
+                `
+            };
+            if (process.env.EMAIL_USER) {
+                await transporter.sendMail(rejectionMailOptions);
             }
         }
 
