@@ -139,7 +139,7 @@ const Cart = () => {
                             {modeMessages[orderData.mode] || "Your delicacy is being prepared by our chefs."}
                         </p>
                         <p className="text-[10px] text-[#8C231F] font-black uppercase tracking-widest">
-                            Order Status: Waiting for Confirmation
+                            Order Status: Waiting for Confirmation...
                         </p>
                     </div>
 

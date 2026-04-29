@@ -54,7 +54,7 @@ exports.createOrder = async (req, res) => {
             
             const modeMessages = {
                 'dine-in': "Please find a comfortable table. Our staff will serve you shortly at your table.",
-                'take-away': "Your order is being packed. We'll notify you when it's ready for pickup.",
+                'take-away': "Your order is being packed. You can come to restaurant and collect it",
                 'delivery': "Sit back and relax! Our delivery partner will be at your doorstep soon."
             };
 
@@ -74,6 +74,13 @@ exports.createOrder = async (req, res) => {
                     <div style="color: #444; line-height: 1.6; font-size: 14px;">
                         <p>Hi <strong>${customerName || 'Valued Guest'}</strong>,</p>
                         <p>We've received your request and our chefs have started preparing your selection. We'll keep you updated on the status.</p>
+                        
+                        <div style="margin-top: 25px; padding: 15px; background-color: #f9f9f9; border-radius: 10px; border-left: 4px solid #8C231F;">
+                            <p style="margin: 0; font-weight: bold; color: #333;">Need to make updates or contact us?</p>
+                            <p style="margin: 5px 0; color: #555;">📞 Phone: <strong>95945674</strong></p>
+                            <p style="margin: 5px 0; color: #555;">📍 Location: Ruwi, Near Badr Al Samaa Hospital, Muscat</p>
+                            <p style="margin: 5px 0; color: #555;">📧 Email: <a href="madeenarestaurantoman@gmail.com" style="color: #8C231F; text-decoration: none;">madeenarestaurantoman@gmail.com</a></p>
+                        </div>
                     </div>
 
                     <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
