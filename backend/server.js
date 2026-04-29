@@ -27,7 +27,15 @@ const visitorRoutes = require('./routes/visitorRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const menuImageRoutes = require('./routes/menuImageRoutes');
 
-connectDB();
+connectDB().then(async () => {
+  // Reset all visitors to offline on server start
+  try {
+    await Visitor.updateMany({}, { isOnline: false });
+    console.log('All visitors reset to offline status');
+  } catch (err) {
+    console.error('Failed to reset visitor status:', err);
+  }
+});
 
 const app = express();
 const server = http.createServer(app);
@@ -75,15 +83,26 @@ app.use('/api/menu-images', menuImageRoutes);
 io.on('connection', (socket) => {
   socket.on('visitor_connected', async (visitorId) => {
     socket.visitorId = visitorId;
-    await Visitor.findOneAndUpdate({ visitorId }, { isOnline: true });
-    io.emit('online_count', await Visitor.countDocuments({ isOnline: true }));
+    await Visitor.findOneAndUpdate(
+      { visitorId }, 
+      { isOnline: true },
+      { upsert: true, new: true }
+    );
+    const onlineCount = await Visitor.countDocuments({ isOnline: true });
+    io.emit('online_count', onlineCount);
   });
 
   socket.on('disconnect', async () => {
     if (socket.visitorId) {
       await Visitor.findOneAndUpdate({ visitorId: socket.visitorId }, { isOnline: false });
-      io.emit('online_count', await Visitor.countDocuments({ isOnline: true }));
+      const onlineCount = await Visitor.countDocuments({ isOnline: true });
+      io.emit('online_count', onlineCount);
     }
+  });
+  
+  // Send current count to newly connected socket (e.g. admin panel)
+  Visitor.countDocuments({ isOnline: true }).then(count => {
+    socket.emit('online_count', count);
   });
 });
 

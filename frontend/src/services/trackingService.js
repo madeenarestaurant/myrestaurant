@@ -36,18 +36,29 @@ class TrackingService {
 
   initSocket() {
     this.socket = io(SOCKET_URL);
-    this.socket.emit('visitor_connected', this.visitorId);
+    this.socket.on('connect', () => {
+      this.socket.emit('visitor_connected', this.visitorId);
+    });
   }
 
   async trackPageVisit() {
     try {
-      const parser = new UAParser();
       const userAgent = navigator.userAgent;
+      
+      // Try to get external IP for better geolocation in dev environments
+      let externalIp = null;
+      try {
+        const ipRes = await axios.get('https://api.ipify.org?format=json', { timeout: 2000 });
+        externalIp = ipRes.data.ip;
+      } catch (e) {
+        // Ignore IP fetch failure
+      }
 
       await axios.post(`${API_URL}/track`, {
         visitorId: this.visitorId,
         path: window.location.pathname,
         userAgent,
+        externalIp,
         screenResolution: `${window.screen.width}x${window.screen.height}`
       });
     } catch (error) {

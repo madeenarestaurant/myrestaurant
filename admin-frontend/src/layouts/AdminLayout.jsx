@@ -6,7 +6,6 @@ import Dashboard from '../pages/Dashboard';
 import Orders from '../pages/Orders';
 import Products from '../pages/Products';
 import Reservations from '../pages/Reservations';
-import Settings from '../pages/Settings';
 import Profile from '../pages/Profile';
 import Notifications from '../pages/Notifications';
 import Visitors from '../pages/Visitors';
@@ -38,7 +37,6 @@ const AdminLayout = () => {
       case 'orders': return <Orders />;
       case 'products': return <Products />;
       case 'reservations': return <Reservations />;
-      case 'settings': return <Settings />;
       case 'profile': return <Profile />;
       case 'notifications': return <Notifications />;
       case 'visitors': return <Visitors />;

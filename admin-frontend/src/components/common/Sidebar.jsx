@@ -30,7 +30,6 @@ const Sidebar = () => {
     { id: 'visitors', label: 'Visitors', icon: FiUsers },
     { id: 'products', label: 'Items', icon: FiLayers },
     { id: 'notifications', label: 'Notifications', icon: FiBell },
-    { id: 'settings', label: 'Settings', icon: FiSettings },
   ];
 
   const handleLogout = async () => {
@@ -51,7 +50,7 @@ const Sidebar = () => {
         <div className="flex items-center gap-4 overflow-hidden">
             <div className="w-12 h-12 flex items-center justify-center shrink-0">
                 <img 
-                    src="https://madeena-res-bucket.s3.us-east-1.amazonaws.com/res-files/logo.png" 
+                    src="https://madeena-res-bucket.s3.us-east-1.amazonaws.com/res-files/madeena-logo.png" 
                     alt="Logo" 
                     className="w-10 h-10 object-contain drop-shadow-sm" 
                 />

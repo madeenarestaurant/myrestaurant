@@ -121,14 +121,14 @@ const Header = () => {
                                 </button>
                                 
                                 <button 
-                                    onClick={() => { setActiveTab('settings'); setShowProfilePopup(false); }}
+                                    onClick={() => { setActiveTab('notifications'); setShowProfilePopup(false); }}
                                     className="w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-[1.2rem] transition-all group"
                                 >
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover:text-amber-500 group-hover:bg-amber-50 transition-all">
-                                            <FiSettings size={14} />
+                                            <FiBell size={14} />
                                         </div>
-                                        <span className="text-xs font-bold text-gray-600 group-hover:text-gray-800 transition-colors">Settings</span>
+                                        <span className="text-xs font-bold text-gray-600 group-hover:text-gray-800 transition-colors">Notifications</span>
                                     </div>
                                     <FiChevronRight size={14} className="text-gray-300 group-hover:text-amber-500 transition-colors" />
                                 </button>
