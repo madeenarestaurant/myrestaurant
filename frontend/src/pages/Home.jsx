@@ -54,9 +54,8 @@ const Home = () => {
 
             {/* Social Icons Overlay (Bottom Right Corner) */}
             <div className="absolute bottom-2 right-6 z-30 flex items-center gap-4">
-              <SocialIcon Icon={Icons.Instagram} />
-              <SocialIcon Icon={Icons.Facebook} />
-              <SocialIcon Icon={Icons.Threads} />
+              <SocialIcon Icon={Icons.Instagram} link="https://www.instagram.com/madeena_restaurant_oman/" />
+              <SocialIcon Icon={Icons.Facebook} link="https://www.facebook.com/p/Madeena-Restaurants-Oman-61586056372173/" />
             </div>
 
             {/* Catchphrase Overlay */}
@@ -87,10 +86,15 @@ const Home = () => {
   );
 };
 
-const SocialIcon = ({ Icon }) => (
-  <button className="w-9 h-9 flex items-center justify-center text-white/80 hover:text-white transition-all focus:outline-none drop-shadow-lg">
+const SocialIcon = ({ Icon, link }) => (
+  <a 
+    href={link} 
+    target="_blank" 
+    rel="noopener noreferrer" 
+    className="w-9 h-9 flex items-center justify-center text-white/80 hover:text-white transition-all focus:outline-none drop-shadow-lg"
+  >
     <Icon />
-  </button>
+  </a>
 );
 
 const SideCard = ({ title, image, link, delay }) => (

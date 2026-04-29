@@ -127,7 +127,7 @@ const Locations = () => {
             </div>
             
             <a 
-              href="https://maps.app.goo.gl/bCLVcPtDFfsWBRHfA" 
+              href="https://share.google/5fF6CFp9mwl7oVHk0" 
               target="_blank" 
               rel="noreferrer"
               className="mt-2 px-8 py-3 bg-white text-black text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase rounded-full hover:bg-gray-200 transition-all transform hover:scale-105 shadow-lg"

@@ -244,7 +244,10 @@ const About = () => {
                 >
                   <div className="aspect-video relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
                     <video 
-                      controls 
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
                       className="w-full h-full object-cover"
                       poster={images[i % images.length]?.path}
                     >

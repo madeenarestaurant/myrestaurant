@@ -29,5 +29,22 @@ export const orderApi = {
   create: (data) => api.post('/orders', data),
 };
 
+let imageCache = null;
+let cacheTime = 0;
+const CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+export const menuImageApi = {
+  getCache: () => imageCache,
+  getAll: async () => {
+    if (imageCache && (Date.now() - cacheTime < CACHE_TTL)) {
+      return { data: imageCache };
+    }
+    const response = await api.get('/menu-images');
+    imageCache = response.data;
+    cacheTime = Date.now();
+    return response;
+  }
+};
+
 
 export default api;

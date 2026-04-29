@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-
 import { motion, AnimatePresence } from "framer-motion";
 import { getAssetUrl } from "../config";
-
-const logoImg = getAssetUrl("logo.png");
-const titleImg = getAssetUrl("titlename.jpeg");
-
 
 const Icons = {
   Menu: () => (
@@ -24,6 +19,9 @@ const Icons = {
 
 const Navbar = ({ transparent = true }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const logoImg = getAssetUrl("madeena-logo.png");
+  const titleImg = getAssetUrl("titlename.jpeg");
+
   const location = useLocation();
   const isHome = location.pathname === "/";
 
@@ -63,9 +61,9 @@ const Navbar = ({ transparent = true }) => {
             {/* Logo on top of the left side of the banner */}
             <motion.div
               layoutId="logo-main"
-              className="absolute left-[1.5%] -ml-[2px] top-0 h-full flex items-center justify-center p-1"
+              className="absolute left-[2.5%] top-0 h-full flex items-center justify-center p-0"
             >
-              <img src={logoImg} alt="Madeena Logo" className="h-full w-auto drop-shadow-2xl" />
+              <img src={logoImg} alt="Madeena Logo" className="h-[105%] w-auto drop-shadow-2xl" />
             </motion.div>
           </Link>
         )}
