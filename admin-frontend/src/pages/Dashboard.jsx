@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import StatsCard from '../components/dashboard/StatsCard';
+import AnalyticsChart from '../components/dashboard/AnalyticsChart';
 import { 
   FiShoppingCart, 
   FiActivity, 
@@ -17,10 +18,11 @@ import { clsx } from 'clsx';
 import { format } from 'date-fns'; // re-scan
 
 const Dashboard = () => {
-  const { stats, recentOrders, reservations, fetchStats, loading, setActiveTab } = useAdminStore();
+  const { stats, recentOrders, reservations, visitors, fetchStats, fetchVisitors, loading, setActiveTab } = useAdminStore();
 
   useEffect(() => {
     fetchStats();
+    fetchVisitors();
   }, []);
 
   const formatCurrency = (val) => `₹${val?.toLocaleString()}`;
@@ -70,55 +72,7 @@ const Dashboard = () => {
       </div>
 
       {/* Analytics Chart Section */}
-      <div className="bg-white rounded-[2.5rem] p-6 md:p-10 border border-gray-100 shadow-sm relative overflow-hidden group">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 relative z-10">
-                <div>
-                    <h3 className="text-xl font-black text-gray-800 tracking-tight">Order Analytics</h3>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Monthly performance review</p>
-                </div>
-                <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2">
-                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/20" />
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Revenue</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-lg shadow-rose-500/20" />
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Expenses</span>
-                    </div>
-                </div>
-            </div>
-
-            <div className="h-[250px] md:h-[320px] relative">
-                <svg className="w-full h-full" viewBox="0 0 1000 300" preserveAspectRatio="none">
-                    {[0, 1, 2, 3, 4, 5].map(v => (
-                        <line key={v} x1="0" y1={v * 60} x2="1000" y2={v * 60} stroke="#f8f8f8" strokeWidth="1" />
-                    ))}
-                    <motion.path 
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 2, ease: "easeInOut" }}
-                        d="M0,220 C150,150 250,250 400,200 C550,150 750,50 1000,180" 
-                        fill="none" 
-                        stroke="#10B981" 
-                        strokeWidth="5" 
-                        strokeLinecap="round" 
-                    />
-                    <motion.path 
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 2, ease: "easeInOut", delay: 0.5 }}
-                        d="M0,150 C200,160 300,280 500,180 C700,80 850,220 1000,200" 
-                        fill="none" 
-                        stroke="#EF4444" 
-                        strokeWidth="5" 
-                        strokeLinecap="round" 
-                    />
-                </svg>
-                <div className="flex justify-between mt-8 px-2 text-[9px] font-black text-gray-300 uppercase tracking-[0.2em]">
-                    {['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'].map(m => <span key={m}>{m}</span>)}
-                </div>
-            </div>
-      </div>
+      <AnalyticsChart orders={recentOrders} reservations={reservations} visitors={visitors} />
 
       {/* Grid Layout for Detailed Sections */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
