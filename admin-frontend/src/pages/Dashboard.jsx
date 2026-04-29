@@ -17,7 +17,7 @@ import { clsx } from 'clsx';
 import { format } from 'date-fns'; // re-scan
 
 const Dashboard = () => {
-  const { stats, recentOrders, reservations, fetchStats, loading } = useAdminStore();
+  const { stats, recentOrders, reservations, fetchStats, loading, setActiveTab } = useAdminStore();
 
   useEffect(() => {
     fetchStats();
@@ -25,9 +25,15 @@ const Dashboard = () => {
 
   const formatCurrency = (val) => `₹${val?.toLocaleString()}`;
 
-  // Calculate today's orders
+  // Calculate today's orders and reservations
   const today = new Date().toDateString();
   const todayOrders = (recentOrders || []).filter(o => new Date(o.createdAt).toDateString() === today);
+  const todayReservations = (reservations || []).filter(r => new Date(r.createdAt).toDateString() === today);
+  
+  const combinedActivity = [
+    ...todayOrders.map(o => ({ ...o, activityType: 'order' })),
+    ...todayReservations.map(r => ({ ...r, activityType: 'reservation' }))
+  ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   return (
     <div className="space-y-6 md:space-y-8 pb-10">
@@ -122,36 +128,54 @@ const Dashboard = () => {
                 <div className="flex justify-between items-center mb-8">
                     <div>
                         <h4 className="text-base font-black text-gray-800 uppercase tracking-tight">Today's Activity</h4>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{todayOrders.length} orders received today</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                            {todayOrders.length} orders & {todayReservations.length} reservations today
+                        </p>
                     </div>
                     <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-300">
-                        <FiShoppingBag size={18} />
+                        <FiActivity size={18} />
                     </div>
                 </div>
                 <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2">
-                    {todayOrders.length === 0 ? (
+                    {combinedActivity.length === 0 ? (
                         <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
-                            <FiShoppingBag size={48} className="mb-4" />
-                            <p className="text-xs font-black uppercase tracking-widest">No orders yet today</p>
+                            <FiActivity size={48} className="mb-4" />
+                            <p className="text-xs font-black uppercase tracking-widest">No activity yet today</p>
                         </div>
                     ) : (
-                        todayOrders.map((order) => (
-                            <div key={order._id} className="flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-50 rounded-[1.5rem] transition-all group">
+                        combinedActivity.map((item) => (
+                            <div 
+                                key={item._id} 
+                                onClick={() => setActiveTab(item.activityType === 'reservation' ? 'reservations' : 'orders')}
+                                className={clsx(
+                                    "flex items-center justify-between p-4 rounded-[1.5rem] transition-all group cursor-pointer",
+                                    item.activityType === 'reservation' ? "bg-indigo-50/50 hover:bg-indigo-50" : "bg-gray-50/50 hover:bg-gray-50"
+                                )}
+                            >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-[#8B3B3B] group-hover:scale-110 transition-transform">
-                                        <FiShoppingCart size={20} />
+                                    <div className={clsx(
+                                        "w-12 h-12 rounded-2xl shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform",
+                                        item.activityType === 'order' ? "bg-white text-[#8B3B3B]" : "bg-indigo-600 text-white"
+                                    )}>
+                                        {item.activityType === 'order' ? <FiShoppingCart size={20} /> : <FiCalendar size={20} />}
                                     </div>
                                     <div>
-                                        <p className="font-black text-sm text-gray-800 truncate max-w-[150px]">{order.customerName || 'Walk-in'}</p>
-                                        <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">{format(new Date(order.createdAt), 'hh:mm a')}</p>
+                                        <p className="font-black text-sm text-gray-800 truncate max-w-[150px]">
+                                            {item.customerName || item.fullName || 'Walk-in'}
+                                        </p>
+                                        <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">
+                                            {format(new Date(item.createdAt), 'hh:mm a')} • <span className={item.activityType === 'reservation' ? "text-indigo-500" : ""}>{item.activityType}</span>
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="font-black text-sm text-gray-800">{formatCurrency(order.totalAmount)}</p>
+                                    <p className="font-black text-sm text-gray-800">
+                                        {item.activityType === 'order' ? formatCurrency(item.totalAmount) : `${item.guests} Pax`}
+                                    </p>
                                     <span className={clsx(
                                         "text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded",
-                                        order.status === 'requested' ? "text-amber-500" : "text-emerald-500"
-                                    )}>{order.status}</span>
+                                        item.status === 'requested' || item.status === 'Requested' ? "text-amber-500" : "text-emerald-500"
+                                    )}>{item.status}</span>
                                 </div>
                             </div>
                         ))

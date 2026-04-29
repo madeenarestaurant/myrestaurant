@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../api/axiosInstance';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiBell, FiTrash2, FiCheck, FiX, FiClock, FiShoppingBag, FiCalendar } from 'react-icons/fi';
+import { FiBell, FiTrash2, FiCheck, FiX, FiClock, FiShoppingBag, FiCalendar, FiAlertCircle } from 'react-icons/fi';
+import useAdminStore from '../store/useAdminStore';
+import { clsx } from 'clsx';
 import { format } from 'date-fns'; // date-fns is installed, please restart dev server if error persists
 
 const Notifications = () => {
+    const { setActiveTab } = useAdminStore();
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -90,15 +93,34 @@ const Notifications = () => {
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 20 }}
-                                className="bg-white p-6 rounded-[1.5rem] shadow-sm border border-gray-100 flex items-start gap-4 group hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300"
+                                onClick={() => setActiveTab(notification.type === 'reservation' ? 'reservations' : 'orders')}
+                                className={clsx(
+                                    "p-6 rounded-[1.5rem] shadow-sm border flex items-start gap-4 group cursor-pointer transition-all duration-300",
+                                    notification.type === 'reservation' 
+                                        ? "bg-indigo-50/30 border-indigo-100 hover:bg-indigo-50/50 hover:shadow-indigo-200/20" 
+                                        : "bg-white border-gray-100 hover:shadow-xl hover:shadow-gray-200/40"
+                                )}
                             >
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-                                    notification.type === 'order' ? 'bg-amber-50 text-amber-600' : 'bg-indigo-50 text-indigo-600'
-                                }`}>
+                                <div className={clsx(
+                                    "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
+                                    notification.type === 'order' ? 'bg-amber-50 text-amber-600' : 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
+                                )}>
                                     {notification.type === 'order' ? <FiShoppingBag size={20} /> : <FiCalendar size={20} />}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-bold text-gray-800 leading-snug">{notification.message}</p>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <p className={clsx(
+                                            "text-sm font-bold leading-snug",
+                                            notification.type === 'reservation' ? "text-indigo-900" : "text-gray-800"
+                                        )}>
+                                            {notification.message}
+                                        </p>
+                                        {notification.type === 'reservation' && (
+                                            <span className="px-2 py-0.5 rounded-full bg-indigo-600 text-[8px] font-black uppercase tracking-widest text-white shrink-0">
+                                                Action Required
+                                            </span>
+                                        )}
+                                    </div>
                                     <div className="flex items-center gap-3 mt-2">
                                         <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
                                             <FiClock size={12} /> {format(new Date(notification.createdAt), 'hh:mm a')}
@@ -109,7 +131,10 @@ const Notifications = () => {
                                     </div>
                                 </div>
                                 <button 
-                                    onClick={() => deleteNotification(notification._id)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        deleteNotification(notification._id);
+                                    }}
                                     className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-rose-50 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all shrink-0"
                                 >
                                     <FiX size={18} />

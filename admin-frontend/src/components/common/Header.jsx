@@ -159,33 +159,70 @@ const Header = () => {
             initial={{ opacity: 0, x: 100, scale: 0.9 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 100, scale: 0.9 }}
-            className="fixed top-4 right-4 z-[100] w-full max-w-[320px]"
+            className={clsx(
+                "fixed top-4 right-4 z-[100] w-full",
+                newNotification.type === 'reservation' ? "max-w-[400px]" : "max-w-[320px]"
+            )}
           >
-            <div className="bg-white/95 backdrop-blur-sm border border-gray-100 shadow-2xl rounded-3xl p-4 flex items-start gap-4">
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
-                newNotification.type === 'order' ? 'bg-amber-50 text-amber-600' : 'bg-indigo-50 text-indigo-600'
-              }`}>
-                {newNotification.type === 'order' ? <FiShoppingBag size={20} /> : <FiCalendar size={20} />}
+            <div className={clsx(
+                "backdrop-blur-sm border shadow-2xl rounded-3xl p-5 flex items-start gap-4 transition-all duration-500",
+                newNotification.type === 'reservation' 
+                    ? "bg-indigo-600 text-white border-indigo-400/30 ring-4 ring-indigo-500/20" 
+                    : "bg-white/95 border-gray-100 text-gray-800"
+            )}>
+              <div className={clsx(
+                "w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg",
+                newNotification.type === 'order' ? 'bg-amber-50 text-amber-600' : 'bg-white/20 text-white'
+              )}>
+                {newNotification.type === 'order' ? <FiShoppingBag size={24} /> : <FiCalendar size={24} />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#8B3B3B] mb-1">
-                  New {newNotification.type}
+                <p className={clsx(
+                    "text-[10px] font-black uppercase tracking-widest mb-1",
+                    newNotification.type === 'reservation' ? "text-indigo-100" : "text-[#8B3B3B]"
+                )}>
+                  {newNotification.type === 'reservation' ? '⚠️ High Priority Reservation' : `New ${newNotification.type}`}
                 </p>
-                <p className="text-xs font-bold text-gray-800 leading-tight">
+                <p className={clsx(
+                    "font-black leading-tight",
+                    newNotification.type === 'reservation' ? "text-lg text-white" : "text-sm text-gray-800"
+                )}>
                   {newNotification.message}
                 </p>
-                <button 
-                  onClick={() => setActiveTab('notifications')}
-                  className="mt-2 text-[10px] font-black text-[#8B3B3B] uppercase hover:underline"
-                >
-                  View Details
-                </button>
+                <div className="flex items-center gap-4 mt-3">
+                    <button 
+                        onClick={() => {
+                            setActiveTab(newNotification.type === 'reservation' ? 'reservations' : 'orders');
+                            useAdminStore.setState({ newNotification: null });
+                        }}
+                        className={clsx(
+                            "text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all",
+                            newNotification.type === 'reservation' 
+                                ? "bg-white text-indigo-600 hover:bg-indigo-50" 
+                                : "bg-gray-100 text-gray-600 hover:bg-[#8B3B3B] hover:text-white"
+                        )}
+                    >
+                        View Details
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('notifications')}
+                        className={clsx(
+                            "text-[9px] font-bold uppercase tracking-widest opacity-60 hover:opacity-100",
+                            newNotification.type === 'reservation' ? "text-white" : "text-gray-400"
+                        )}
+                    >
+                        See All
+                    </button>
+                </div>
               </div>
               <button 
                 onClick={() => useAdminStore.setState({ newNotification: null })}
-                className="text-gray-300 hover:text-gray-500 transition-colors"
+                className={clsx(
+                    "transition-colors mt-1",
+                    newNotification.type === 'reservation' ? "text-white/40 hover:text-white" : "text-gray-300 hover:text-gray-500"
+                )}
               >
-                <FiX size={14} />
+                <FiX size={16} />
               </button>
             </div>
           </motion.div>
