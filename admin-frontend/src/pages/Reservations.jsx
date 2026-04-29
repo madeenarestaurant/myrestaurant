@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../api/axiosInstance';
+import api from '../api';
 import useAdminStore from '../store/useAdminStore';
 
 import { 
@@ -39,7 +39,7 @@ const Reservations = () => {
     const finalMessage = message.trim() || 'Your reservation status has been updated. Thank you for choosing Madeena Restaurant.';
     
     try {
-      await axiosInstance.put(`/reservations/${id || modalData.id}`, { 
+      await api.reservations.update(id || modalData.id, { 
         status: status || (modalData.type === 'accept' ? 'Confirmed' : 'Rejected'),
         messageToUser: finalMessage,
         paymentStatus: paymentStatus

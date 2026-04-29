@@ -10,7 +10,7 @@ import {
   FiBell,
   FiUsers
 } from 'react-icons/fi';
-import axiosInstance from '../../api/axiosInstance';
+import api from '../../api';
 import useAdminStore from '../../store/useAdminStore';
 import { useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
@@ -34,7 +34,7 @@ const Sidebar = () => {
 
   const handleLogout = async () => {
     try {
-        await axiosInstance.post('/admin/logout');
+        await api.auth.logout();
     } catch (err) {
         console.error('Logout failed:', err);
     }

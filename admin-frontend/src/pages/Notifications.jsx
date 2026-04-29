@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axiosInstance from '../api/axiosInstance';
+import api from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiBell, FiTrash2, FiCheck, FiX, FiClock, FiShoppingBag, FiCalendar, FiAlertCircle } from 'react-icons/fi';
 import useAdminStore from '../store/useAdminStore';
@@ -13,7 +13,7 @@ const Notifications = () => {
 
     const fetchNotifications = async () => {
         try {
-            const res = await axiosInstance.get('/notifications');
+            const res = await api.notifications.getAll();
             setNotifications(res.data);
         } catch (err) {
             console.error('Error fetching notifications:', err);
@@ -28,7 +28,7 @@ const Notifications = () => {
 
     const deleteNotification = async (id) => {
         try {
-            await axiosInstance.delete(`/notifications/${id}`);
+            await api.notifications.delete(id);
             setNotifications(notifications.filter(n => n._id !== id));
         } catch (err) {
             console.error('Error deleting notification:', err);
@@ -37,7 +37,7 @@ const Notifications = () => {
 
     const clearAll = async () => {
         try {
-            await axiosInstance.delete('/notifications');
+            await api.notifications.clearAll();
             setNotifications([]);
         } catch (err) {
             console.error('Error clearing notifications:', err);

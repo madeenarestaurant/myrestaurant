@@ -19,9 +19,9 @@ const AdminLayout = () => {
   const { activeTab, initSocket } = useAdminStore();
 
   useEffect(() => {
-    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://:8080';
     const socketUrl = apiBase.endsWith('/api') ? apiBase.replace('/api', '') : apiBase;
-    
+
     const socket = io(socketUrl);
     initSocket(socket);
 
@@ -54,9 +54,9 @@ const AdminLayout = () => {
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative">
         {/* Decorative shadow layer */}
         <div className="absolute top-0 left-0 w-32 h-full bg-gradient-to-r from-gray-100/50 to-transparent pointer-events-none z-0" />
-        
+
         <Header />
-        
+
         <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-10 custom-scrollbar relative z-10 pb-40 md:pb-10">
           <div className="max-w-[1600px] mx-auto">
             <AnimatePresence mode="wait">
@@ -72,7 +72,7 @@ const AdminLayout = () => {
             </AnimatePresence>
           </div>
         </main>
-        
+
         {/* Bottom Nav for Mobile */}
         <MobileNav />
       </div>

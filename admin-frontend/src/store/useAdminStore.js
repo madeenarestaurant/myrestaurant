@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import axiosInstance from '../api/axiosInstance';
+import api from '../api';
 
 const useAdminStore = create((set, get) => ({
   activeTab: localStorage.getItem('adminActiveTab') || 'dashboard',
@@ -34,7 +34,7 @@ const useAdminStore = create((set, get) => ({
 
   fetchVisitors: async () => {
     try {
-        const res = await axiosInstance.get('/visitors');
+        const res = await api.visitors.getAll();
         set({ visitors: res.data });
     } catch (error) {
         console.error('Error fetching visitors:', error);
@@ -43,7 +43,7 @@ const useAdminStore = create((set, get) => ({
 
   fetchProfile: async () => {
     try {
-        const res = await axiosInstance.get('/admin/profile');
+        const res = await api.auth.getProfile();
         set({ profile: res.data });
     } catch (error) {
         console.error('Error fetching profile:', error);
@@ -52,9 +52,7 @@ const useAdminStore = create((set, get) => ({
 
   updateProfile: async (data, isFormData = false) => {
     try {
-        const res = await axiosInstance.put('/admin/profile', data, {
-            headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {}
-        });
+        const res = await api.auth.updateProfile(data, isFormData);
         set({ profile: res.data });
         return { success: true };
     } catch (error) {
@@ -67,11 +65,11 @@ const useAdminStore = create((set, get) => ({
     set({ loading: true });
     try {
         const [prodRes, catRes, orderRes, resvRes, visitorRes] = await Promise.all([
-            axiosInstance.get('/products'),
-            axiosInstance.get('/categories'),
-            axiosInstance.get('/orders'),
-            axiosInstance.get('/reservations').catch(() => ({ data: [] })),
-            axiosInstance.get('/visitors/stats').catch(() => ({ data: { totalVisitors: 0, onlineVisitors: 0, topPages: [] } }))
+            api.products.getAll(),
+            api.categories.getAll(),
+            api.orders.getAll(),
+            api.reservations.getAll().catch(() => ({ data: [] })),
+            api.stats.getOverview().catch(() => ({ data: { totalVisitors: 0, onlineVisitors: 0, topPages: [] } }))
         ]);
 
         
@@ -115,7 +113,7 @@ const useAdminStore = create((set, get) => ({
 
   fetchOrders: async () => {
     try {
-        const res = await axiosInstance.get('/orders');
+        const res = await api.orders.getAll();
         set({ recentOrders: res.data });
     } catch (error) {
         console.error('Error fetching orders:', error);
@@ -124,7 +122,7 @@ const useAdminStore = create((set, get) => ({
 
   updateOrderStatus: async (id, data) => {
     try {
-        await axiosInstance.put(`/orders/${id}`, data);
+        await api.orders.updateStatus(id, data);
         get().fetchStats(); // Refresh everything
     } catch (error) {
         console.error('Error updating order status:', error);
@@ -133,7 +131,7 @@ const useAdminStore = create((set, get) => ({
 
   deleteProduct: async (id) => {
     try {
-        await axiosInstance.delete(`/products/${id}`);
+        await api.products.delete(id);
         get().fetchStats();
     } catch (error) {
         console.error('Error deleting product:', error);
@@ -142,9 +140,7 @@ const useAdminStore = create((set, get) => ({
 
   updateProduct: async (id, data) => {
     try {
-        await axiosInstance.put(`/products/${id}`, data, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        await api.products.update(id, data);
         get().fetchStats();
         return { success: true };
     } catch (error) {
@@ -155,9 +151,7 @@ const useAdminStore = create((set, get) => ({
 
   createProduct: async (data) => {
     try {
-        await axiosInstance.post('/products', data, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        await api.products.create(data);
         get().fetchStats();
         return { success: true };
     } catch (error) {
@@ -168,7 +162,7 @@ const useAdminStore = create((set, get) => ({
 
   deleteCategory: async (id) => {
     try {
-        await axiosInstance.delete(`/categories/${id}`);
+        await api.categories.delete(id);
         get().fetchStats();
     } catch (error) {
         console.error('Error deleting category:', error);
@@ -177,9 +171,7 @@ const useAdminStore = create((set, get) => ({
 
   updateCategory: async (id, data) => {
     try {
-        await axiosInstance.put(`/categories/${id}`, data, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        await api.categories.update(id, data);
         get().fetchStats();
         return { success: true };
     } catch (error) {
@@ -190,9 +182,7 @@ const useAdminStore = create((set, get) => ({
 
   createCategory: async (data) => {
     try {
-        await axiosInstance.post('/categories', data, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        await api.categories.create(data);
         get().fetchStats();
         return { success: true };
     } catch (error) {

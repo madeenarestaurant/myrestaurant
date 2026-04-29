@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
+  // baseURL: 'https://madeena-api.madeenarestaurant.com/api',
   headers: {
     'Content-Type': 'application/json',
   },

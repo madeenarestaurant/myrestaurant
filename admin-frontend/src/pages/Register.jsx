@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiLoader, FiCheckCircle } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import axiosInstance from '../api/axiosInstance';
+import api from '../api';
 import Toast from '../components/common/Toast';
 
 const Register = () => {
@@ -43,7 +43,7 @@ const Register = () => {
         }
         setLoading(true);
         try {
-            await axiosInstance.post('/admin/send-otp', {
+            await api.auth.sendOTP({
                 email: formData.email,
                 name: formData.name
             });
@@ -78,7 +78,7 @@ const Register = () => {
 
         setLoading(true);
         try {
-            await axiosInstance.post('/admin/reset-password', {
+            await api.auth.resetPassword({
                 email: formData.email,
                 otp: formData.otp,
                 newPassword: formData.password

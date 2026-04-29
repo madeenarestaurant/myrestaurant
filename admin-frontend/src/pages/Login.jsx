@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../api/axiosInstance';
+import api from '../api';
 import Cookies from 'js-cookie';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiLoader } from 'react-icons/fi';
 import { motion } from 'framer-motion';
@@ -18,7 +18,7 @@ const Login = () => {
     setLoading(true);
     setError('');
     try {
-      const { data } = await axiosInstance.post('/admin/login', { email, password });
+      const { data } = await api.auth.login({ email, password });
       Cookies.set('token', data.token, { expires: 7 }); // Expires in 7 days
       navigate('/');
     } catch (err) {
