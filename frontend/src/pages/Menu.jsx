@@ -10,6 +10,7 @@ const menuData = [
   {
     category: "SALADS", type: "grid",
     items: [
+      { name: "RUSSIAN SALAD", price: "1.500 OMR", imageKey: "RUSSIAN SALAD" },
       { name: "Greek Salad", price: "1.785 OMR", imageKey: "Greek Salad" },
       { name: "Arabic Salad", price: "1.575 OMR", imageKey: "Arabic Salad" },
       { name: "Shirazi Salad", price: "1.785 OMR", imageKey: "Shirazi Salad" },
@@ -20,9 +21,7 @@ const menuData = [
       { name: "Vine Leaves", price: "1.890 OMR", imageKey: "Vine Leaves" },
       { name: "Mast Cucumber", price: "1.365 OMR", imageKey: "Mast Cucumber" },
       { name: "Lentil Soup with Bread", price: "1.785 OMR", imageKey: "Lentil Soup with Bread" },
-      { name: "Falodeh", price: "1.680 OMR", imageKey: "Falodeh" },
-      { name: "Kunafa With Iranian Tea", price: "2.310 OMR", imageKey: "Kunafa With Iranian Tea" },
-      { name: "Only Kunafa", price: "2.100 OMR", noImage: true }
+      { name: "Falodeh", price: "1.680 OMR", imageKey: "Falodeh" }
     ]
   },
   {
@@ -157,10 +156,10 @@ const menuData = [
   {
     category: "SOUP", type: "grid",
     items: [
-      { name: "SWEET CORN SOUP CHICKEN", price: "0.800 OMR", imageKey: "SWEET CORN SOUP (VEGCHICKEN)" },
-      { name: "SWEET CORN SOUP VEGTABLE", price: "0.800 OMR", imageKey: "SWEET CORN SOUP (VEGCHICKEN)" },
-      { name: "CHICKEN CLEAR SOUP", price: "0.500 / 0.600 OMR", imageKey: "CHICKEN CLEAR SOUP (VEGCHICKEN)" },
-      { name: "VEGETABLE CLEAR SOUP", price: "0.500 / 0.600 OMR", imageKey: "CHICKEN CLEAR SOUP (VEGCHICKEN)" }
+      { name: "SWEET CORN SOUP CHICKEN", price: "0.800 OMR", imageKey: "SWEET CORN SOUPCHICKEN" },
+      { name: "SWEET CORN SOUP VEG", price: "0.800 OMR", imageKey: "SWEET CORN SOUP VEG" },
+      { name: "CHICKEN CLEAR SOUP", price: "0.500 / 0.600 OMR", imageKey: "CHICKEN CLEAR SOUP" },
+      { name: "VEG CLEAR SOUP", price: "0.500 / 0.600 OMR", imageKey: "VEG CLEAR SOUP" }
     ]
   },
   {
@@ -179,10 +178,10 @@ const menuData = [
       { name: "FISH RAW MANGO POLLICHAD", price: "AS PER SIZE", imageKey: "FISH RAW MANGO POLLICHAD" },
       { name: "KADA EGG", price: "1.200 OMR", imageKey: "KAADAMUTTA ROAST" },
       { name: "MONJATHI CHICKEN", price: "3.200 OMR", imageKey: "MONJATHI KOZHI" },
-      { name: "PUTHYAPILA CHICKEN", price: "3.000 OMR", imageKey: "PUTHYAPILA CHICKEN" },
+      { name: "PUTHIYPLA CHICKEN", price: "3.000 OMR", imageKey: "PUTHIYPLA CHICKEN" },
       { name: "MALABAR VEG KURUMA", price: "0.600 OMR", imageKey: "MALABAR VEG KURUMA" },
-      { name: "VEG STEW", price: "0.700 OMR", imageKey: "VEG STEW" },
-      { name: "VEG KADAI", price: "0.800 OMR", imageKey: "VEG KADAI" },
+      { name: "Veg stew", price: "0.700 OMR", imageKey: "Veg stew" },
+      { name: "Veg Kadai", price: "0.800 OMR", imageKey: "Veg Kadai" },
       { name: "GOPI MANCHURI", price: "1.100 OMR", imageKey: "GOPI MANCHURI" },
       { name: "GOBI 65", price: "1.100 OMR", imageKey: "GOBI 65" },
       { name: "ANGAMALI MANGO CURRY", price: "0.700 OMR", imageKey: "ANGAMALIMANGO CURRY" },
@@ -206,7 +205,7 @@ const menuData = [
     items: [
       { name: "BEEF PAAL CURRY", price: "1.400 OMR", imageKey: "BEEF PAAL CURRY" },
       { name: "VARUTHARACHA CURRY", price: "1.200 OMR", imageKey: "VARUTHARACHA CURRY" },
-      { name: "BUTTER CURRY", price: "1.400 OMR", imageKey: "BUTTER CURRY" },
+      { name: "BUTTER CHICKEN CURRY", price: "1.400 OMR", imageKey: "BUTTER CHICKEN CURRY" },
       { name: "BOTI", price: "1.500 OMR", imageKey: "BOTI" },
       { name: "LIVER FRY", price: "1.500 OMR", imageKey: "LIVER FRY" },
       { name: "KIDNEY FRY", price: "1.500 OMR", imageKey: "KIDNEY FRY" }
@@ -216,7 +215,9 @@ const menuData = [
     category: "DESSERTS", type: "grid",
     items: [
       { name: "KUNAFA WITH ICE CREAM", price: "2.500 OMR", imageKey: "KUNAFA WITH ICE CREAM" },
-      { name: "FRUIT SALAD WITH ICE CREAM", price: "1.500 OMR", imageKey: "FRUIT SALAD WITH ICE CREAM" }
+      { name: "FRUIT SALAD WITH ICE CREAM", price: "1.500 OMR", imageKey: "FRUIT SALAD WITH ICE CREAM" },
+      { name: "Kunafa With Iranian Tea", price: "2.310 OMR", imageKey: "Kunafa With Iranian Tea" },
+      { name: "KUNAFA", price: "2.100 OMR", imageKey: "KUNAFA" }
     ]
   },
   {
@@ -281,16 +282,16 @@ const menuData = [
       { name: "FALOODA", price: "0.800 / 1.200 OMR", imageKey: "FALOODA" },
       { name: "MIX ICE CREAM", price: "0.600 / 1.100 OMR", imageKey: "MIX ICE CREAM" },
       { name: "AVOCADO", price: "0.800 / 1.100 OMR", imageKey: "AVOCADO" },
-      { name: "BLUEBERRY", price: "0.800 / 1.000 OMR", imageKey: "BLUEBERRY" }
+      { name: "BLUEBERRY", price: "0.800 / 1.000 OMR", imageKey: "BLUEBERRY" },
+      { name: "PAPPAYA", price: "0.700 / 1.000 OMR", imageKey: "PAPPAYA" },
+      { name: "KIWI", price: "0.700 / 0.900 OMR", imageKey: "KIWI" },
+      { name: "STRAWBERRY MILKSHAKE", price: "1.000 / 1.300 OMR", imageKey: "STRAWBERRY MILKSHAKE" }
     ]
   },
   {
     category: "MOJITOS & JUICES", type: "grid",
     items: [
-      { name: "PAPPAYA", price: "0.700 / 1.000 OMR", imageKey: "PAPPAYA" },
       { name: "PASSION FRUIT JUICE", price: "0.800 / 1.000 OMR", imageKey: "PASSION FRUIT JUICE" },
-      { name: "KIWI", price: "0.700 / 0.900 OMR", imageKey: "KIWI" },
-      { name: "STRAWBERRY MILKSHAKE", price: "1.000 / 1.300 OMR", imageKey: "STRAWBERRY MILKSHAKE" },
       { name: "LEMON MINT MOJITO", price: "0.800 / 1.100 OMR", imageKey: "LEMON MINT MOJITO" },
       { name: "STRAWBERRY MOJITO", price: "0.800 / 1.100 OMR", imageKey: "STRAWBERRY MOJITO" },
       { name: "BLUEBERRY MOJITO", price: "0.800 / 1.100 OMR", imageKey: "BLUEBERRY MOJITO" },
@@ -315,7 +316,6 @@ const menuData = [
     items: [
       { name: "MUTTON RIBS", price: "3.200 OMR", imageKey: "MUTTON RIBS" },
       { name: "MIXED GRILL", price: "AS PER SIZE", imageKey: "MIXED GRILL" },
-      { name: "RUSSIAN SALAD", price: "1.500 OMR", imageKey: "RUSSIAN SALAD" },
       { name: "MASALA SHAWAYA", price: "3.000 OMR", imageKey: "MASALA SHAWAYA" }
     ]
   }
@@ -420,8 +420,8 @@ const Menu = () => {
                           <span className="tracking-widest">{item.name}</span>
                         </div>
                       ) : (
-                        <div className="relative mb-4 w-36 h-36 md:w-40 md:h-40 mx-auto bg-[#1e1e20] rounded-2xl flex items-center justify-center border-[3px] border-[#4a4a50] shadow-xl overflow-visible group-hover:scale-105 group-hover:shadow-2xl group-hover:border-[#8C231F] transition-all duration-500">
-                          <img src={imageSrc} alt={item.name} className="object-cover rounded-[1rem] w-full h-full" />
+                        <div className="relative mb-4 w-36 h-36 md:w-40 md:h-40 mx-auto bg-white rounded-2xl flex items-center justify-center border-[3px] border-[#4a4a50] shadow-xl overflow-visible group-hover:scale-105 group-hover:shadow-2xl group-hover:border-[#8C231F] transition-all duration-500">
+                          <img src={imageSrc} alt={item.name} className="object-contain p-2 rounded-[1rem] w-full h-full" />
                           {item.price && (
                             <div className="absolute -bottom-3 -right-3 bg-[#8C231F] text-white w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center font-bold text-[9px] md:text-[10px] shadow-lg whitespace-pre-line leading-tight">
                               {item.price.replace(" ", "\n")}
@@ -450,9 +450,9 @@ const Menu = () => {
                   const imageSrc = getImage(item.imageKey);
                   return (
                     <div key={idx} className="flex flex-col items-center group w-full">
-                      <div className="relative mb-4 w-36 h-36 md:w-40 md:h-40 mx-auto bg-[#1e1e20] rounded-2xl flex items-center justify-center shadow-xl overflow-visible border-[3px] border-[#4a4a50] group-hover:border-[#8C231F] group-hover:shadow-[0_15px_30px_rgba(140,35,31,0.3)] transition-all duration-500">
+                      <div className="relative mb-4 w-36 h-36 md:w-40 md:h-40 mx-auto bg-white rounded-2xl flex items-center justify-center shadow-xl overflow-visible border-[3px] border-[#4a4a50] group-hover:border-[#8C231F] group-hover:shadow-[0_15px_30px_rgba(140,35,31,0.3)] transition-all duration-500">
                         {imageSrc ? (
-                          <img src={imageSrc} alt={item.name} className="object-cover rounded-[1rem] w-full h-full group-hover:opacity-90 transition-opacity" />
+                          <img src={imageSrc} alt={item.name} className="object-contain p-2 rounded-[1rem] w-full h-full group-hover:opacity-90 transition-opacity" />
                         ) : (
                           <span className="text-[#636368] text-[10px] uppercase tracking-widest font-bold">Image Coming Soon</span>
                         )}
