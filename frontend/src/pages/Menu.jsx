@@ -52,7 +52,7 @@ const menuData = [
     items: [
       { name: "Family Meal Combo", price: "10.000 OMR", fullWidth: true, imageKey: "Family Meal Combo" },
       { name: "Meal for Three Combo", price: "9.000 OMR", fullWidth: true, imageKey: "MEAL-FOR-THREE-COMBO" },
-      { name: "Meal for Two Combo", price: "8.000 OMR", fullWidth: true, imageKey: "Meal for Two Combo" },
+      { name: "MEAL FOR TWO COMBO", price: "", fullWidth: true, imageKey: "MEAL FOR TWO COMBO" },
       { name: "Full Lamb", price: "", imageKey: "Full Lamb" },
       { name: "Mix BBQ With Rice For 4 Person", price: "9.500 OMR", imageKey: "Mix BBQ With Rice For 4 Person" },
       { name: "BBQ Family Jumbo", price: "6.000 OMR", imageKey: "BBQ Family Jumbo" },
@@ -118,7 +118,7 @@ const menuData = [
   {
     category: "TASTY BITES CORNER", type: "grid",
     items: [
-      { name: "CHICKEN TIKKA POROTTA", price: "0.800 OMR", imageKey: "CHICKENBEEF TIKKA" },
+      { name: "CHICKEN TIKKA POROTTA", price: "0.800 OMR", imageKey: "CHICKEN TIKKA POROTTA" },
       { name: "BURGER", price: "1.000 OMR", imageKey: "GRILLED BURGERS" },
       { name: "PIZZA", price: "1.500 / 2.000 OMR", imageKey: "CHICKEN PIZZA" },
       { name: "JIBIN", price: "0.600 OMR", imageKey: "JIBEN" },
@@ -197,7 +197,10 @@ const menuData = [
       { name: "PRAWNS TAWA FRY", price: "1.700 OMR", imageKey: "PRAWNS THAWA FRY" },
       { name: "KAADA FRY", price: "1.300 OMR", imageKey: "KAADA FRY" },
       { name: "MUSHROOM PEPPER DRY", price: "1.200 OMR", imageKey: "MUSHROOMPEPPER DRY" },
-      { name: "CRISPY FRIED VEG", price: "1.000 OMR", imageKey: "CRISPY FRIED VEG" }
+      { name: "CRISPY FRIED VEG", price: "1.000 OMR", imageKey: "CRISPY FRIED VEG" },
+      { name: "CHICKEN/BEEF TIKKA", price: "2.500 OMR", imageKey: "CHICKENBEEF TIKKA" },
+      { name: "SHISH TAWOOK", price: "1.800 OMR", imageKey: "SHISH TAWOOK" },
+      { name: "CHICKEN/BEEF KEBAB", price: "2.500 OMR", imageKey: "CHICKENBEEF KEBAB" }
     ]
   },
   {
@@ -228,7 +231,9 @@ const menuData = [
       { name: "HYDERABAD CHICKEN BIRYANI", price: "1.300 OMR", imageKey: "HYDERABAD CHICKEN BIRYANI" },
       { name: "HYDERABAD MUTTON BIRYANI", price: "1.700 OMR", imageKey: "HYDERABAD MUTTON BIRYANI" },
       { name: "HYDERABAD BEEF BIRYANI", price: "1.500 OMR", imageKey: "HYDERABAD BEEF BIRYANI" },
-      { name: "BUKHARI RICE", price: "1.800 OMR", imageKey: "BUKHARI RICE" }
+      { name: "BUKHARI RICE", price: "1.800 OMR", imageKey: "BUKHARI RICE" },
+      { name: "THALASSERY DUM BIRYANI", price: "1.900 OMR", imageKey: "THALASSERY DUM BIRYANI" },
+      { name: "KUTTAN DUM BIRYANI", price: "2.500 OMR", imageKey: "KUTTAN DUM BIRYANI" }
     ]
   },
   {
