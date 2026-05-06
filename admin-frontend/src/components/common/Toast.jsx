@@ -12,40 +12,36 @@ const Toast = ({ message, type = 'success', onClose }) => {
         }
     }, [message, onClose]);
 
-    if (!message) return null;
-
     const isSuccess = type === 'success';
 
     return (
         <AnimatePresence>
-            <motion.div
-                initial={{ opacity: 0, y: -50, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -50, scale: 0.95 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-                className={`fixed top-4 left-1/2 -translate-x-1/2 z-[10000] min-w-[200px] flex items-center justify-between gap-6 px-5 py-3 rounded-full shadow-[0_20px_40px_rgba(0,0,0,0.15)] border ${
-                    isSuccess 
-                    ? 'bg-white border-emerald-100 text-emerald-600' 
-                    : 'bg-white border-rose-100 text-rose-500'
-                }`}
-            >
-                <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        isSuccess ? 'bg-emerald-50' : 'bg-rose-50'
-                    }`}>
-                        {isSuccess ? <LuCheck size={16} /> : <LuInfo size={16} />}
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-widest">{message}</span>
-                </div>
-                <button 
-                  onClick={onClose} 
-                  className={`p-1 rounded-full transition-colors ${
-                    isSuccess ? 'hover:bg-emerald-50' : 'hover:bg-rose-50'
-                  }`}
+            {message && (
+                <motion.div
+                    initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                    className={`fixed top-24 right-4 md:top-28 md:right-8 z-[10000] min-w-[200px] max-w-[320px] flex items-center justify-between gap-3 px-4 py-3 rounded-xl shadow-lg backdrop-blur-md border ${
+                        isSuccess 
+                        ? 'bg-emerald-500/95 border-emerald-400 text-white shadow-emerald-500/20' 
+                        : 'bg-rose-500/95 border-rose-400 text-white shadow-rose-500/20'
+                    }`}
                 >
-                    <LuX size={14} />
-                </button>
-            </motion.div>
+                    <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-[10px] bg-white/20 flex items-center justify-center shrink-0">
+                            {isSuccess ? <LuCheck size={14} strokeWidth={3} /> : <LuInfo size={14} strokeWidth={3} />}
+                        </div>
+                        <span className="text-xs font-bold leading-tight">{message}</span>
+                    </div>
+                    <button 
+                      onClick={onClose} 
+                      className="p-1.5 rounded-lg transition-all shrink-0 hover:bg-white/20 active:scale-90"
+                    >
+                        <LuX size={14} strokeWidth={3} />
+                    </button>
+                </motion.div>
+            )}
         </AnimatePresence>
     );
 };

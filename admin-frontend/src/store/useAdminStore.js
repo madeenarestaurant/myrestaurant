@@ -136,8 +136,10 @@ const useAdminStore = create((set, get) => ({
     try {
         await api.products.delete(id);
         get().fetchStats();
+        return { success: true };
     } catch (error) {
         console.error('Error deleting product:', error);
+        return { success: false, error: error.response?.data?.message || 'Delete failed' };
     }
   },
 
@@ -167,8 +169,10 @@ const useAdminStore = create((set, get) => ({
     try {
         await api.categories.delete(id);
         get().fetchStats();
+        return { success: true };
     } catch (error) {
         console.error('Error deleting category:', error);
+        return { success: false, error: error.response?.data?.message || 'Delete failed' };
     }
   },
 

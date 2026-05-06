@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import useAdminStore from '../store/useAdminStore';
 import ProductCard from '../components/products/ProductCard';
 import CategoryCard from '../components/products/CategoryCard';
-import { FiSearch, FiPlus, FiX, FiLoader, FiBox, FiLayers, FiUpload, FiCheck } from 'react-icons/fi';
+import { FiSearch, FiPlus, FiX, FiLoader, FiBox, FiLayers, FiUpload, FiCheck, FiTrash2 } from 'react-icons/fi';
 import Toast from '../components/common/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
@@ -15,7 +15,9 @@ const Products = () => {
     createProduct, 
     updateProduct, 
     createCategory, 
-    updateCategory 
+    updateCategory,
+    deleteProduct,
+    deleteCategory
   } = useAdminStore();
 
   const [activeMode, setActiveMode] = useState('products'); // 'products' or 'categories'
@@ -62,7 +64,7 @@ const Products = () => {
         name: item.name || '',
         price: item.price || '',
         description: item.description || '',
-        category: typeof item.category === 'object' ? item.category._id : (item.category || ''),
+        category: item.category && typeof item.category === 'object' ? item.category._id : (item.category || ''),
         status: item.status || 'available',
         isFeatured: item.isFeatured || false
       });
@@ -93,6 +95,22 @@ const Products = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const nameToCheck = formData.name.trim().toLowerCase();
+    if (activeMode === 'products') {
+        const isDuplicate = products.some(p => p.name.toLowerCase() === nameToCheck && (!editingItem || p._id !== editingItem._id));
+        if (isDuplicate) {
+            setToast({ message: 'Product with this name already exists', type: 'error' });
+            return;
+        }
+    } else {
+        const isDuplicate = categories.some(c => c.name.toLowerCase() === nameToCheck && (!editingItem || c._id !== editingItem._id));
+        if (isDuplicate) {
+            setToast({ message: 'Category with this name already exists', type: 'error' });
+            return;
+        }
+    }
+
     setLoading(true);
 
     const data = new FormData();
@@ -130,7 +148,7 @@ const Products = () => {
   const filteredProducts = products.filter(p => {
     const matchesSearch = p.name?.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || 
-                           (typeof p.category === 'object' ? p.category._id : p.category) === selectedCategory;
+                           (p.category && typeof p.category === 'object' ? p.category._id : p.category) === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -186,10 +204,13 @@ const Products = () => {
       <AnimatePresence>
         {activeMode === 'products' && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-            <FilterPill label="All" active={selectedCategory === 'All'} onClick={() => setSelectedCategory('All')} />
-            {categories.map(cat => (
-              <FilterPill key={cat._id} label={cat.name} active={selectedCategory === cat._id} onClick={() => setSelectedCategory(cat._id)} />
-            ))}
+            <FilterPill label="All" count={products.length} active={selectedCategory === 'All'} onClick={() => setSelectedCategory('All')} />
+            {categories.map(cat => {
+              const catProductCount = products.filter(p => (p.category && typeof p.category === 'object' ? p.category._id : p.category) === cat._id).length;
+              return (
+                <FilterPill key={cat._id} label={cat.name} count={catProductCount} active={selectedCategory === cat._id} onClick={() => setSelectedCategory(cat._id)} />
+              );
+            })}
           </motion.div>
         )}
       </AnimatePresence>
@@ -270,8 +291,31 @@ const Products = () => {
                         </div>
 
                         {/* Submit */}
-                        <div className="pt-4">
-                            <button type="submit" disabled={loading} className="w-full py-5 brand-gradient text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-[#8B3B3B]/15 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                        <div className="pt-4 flex gap-3">
+                            {editingItem && (
+                                <button 
+                                    type="button"
+                                    onClick={async () => {
+                                        if (window.confirm(`Delete ${editingItem.name}?`)) {
+                                            const res = activeMode === 'products' 
+                                                ? await deleteProduct(editingItem._id)
+                                                : await deleteCategory(editingItem._id);
+                                            if (res && !res.success) {
+                                                alert(res.error || 'Failed to delete');
+                                            } else {
+                                                setShowDrawer(false);
+                                                resetForm();
+                                                setToast({ message: `${activeMode === 'products' ? 'Product' : 'Category'} deleted!`, type: 'success' });
+                                            }
+                                        }
+                                    }}
+                                    className="px-6 py-5 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.2em] shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center"
+                                    title="Delete"
+                                >
+                                    <FiTrash2 size={18} />
+                                </button>
+                            )}
+                            <button type="submit" disabled={loading} className="flex-1 py-5 brand-gradient text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-[#8B3B3B]/15 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
                                 {loading ? <FiLoader className="animate-spin" /> : editingItem ? <><FiCheck /> Update Details</> : <><FiPlus /> Save to Cloud</>}
                             </button>
                         </div>
@@ -318,15 +362,23 @@ const Products = () => {
   );
 };
 
-const FilterPill = ({ label, active, onClick }) => (
+const FilterPill = ({ label, count, active, onClick }) => (
     <button
         onClick={onClick}
         className={clsx(
-            "px-6 py-2.5 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all whitespace-nowrap border-2",
+            "flex items-center gap-2 px-6 py-2.5 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all whitespace-nowrap border-2",
             active ? "bg-[#8B3B3B] border-[#8B3B3B] text-white shadow-lg" : "bg-white border-gray-50 text-gray-400 hover:border-gray-100"
         )}
     >
-        {label}
+        <span>{label}</span>
+        {count !== undefined && (
+            <span className={clsx(
+                "px-2 py-0.5 rounded-full text-[8px]",
+                active ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"
+            )}>
+                {count}
+            </span>
+        )}
     </button>
 );
 

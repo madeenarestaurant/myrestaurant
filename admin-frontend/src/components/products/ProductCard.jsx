@@ -8,10 +8,13 @@ const ProductCard = ({ product, onEdit }) => {
   const { deleteProduct, updateProduct } = useAdminStore();
   const isAvailable = product.status === 'available';
 
-  const handleDelete = (e) => {
+  const handleDelete = async (e) => {
     e.stopPropagation();
     if (window.confirm(`Delete ${product.name}?`)) {
-      deleteProduct(product._id);
+      const res = await deleteProduct(product._id);
+      if (res && !res.success) {
+        alert(res.error || 'Failed to delete product');
+      }
     }
   };
 
@@ -24,7 +27,7 @@ const ProductCard = ({ product, onEdit }) => {
     await updateProduct(product._id, data);
   };
 
-  const categoryName = typeof product.category === 'object' ? product.category.name : 'Uncategorized';
+  const categoryName = product.category && typeof product.category === 'object' ? product.category.name : 'Uncategorized';
 
   return (
     <div

@@ -5,10 +5,13 @@ import useAdminStore from '../../store/useAdminStore';
 const CategoryCard = ({ category, onEdit }) => {
   const { deleteCategory } = useAdminStore();
 
-  const handleDelete = (e) => {
+  const handleDelete = async (e) => {
     e.stopPropagation();
     if (window.confirm(`Delete ${category.name}? This will affect all products in this category.`)) {
-      deleteCategory(category._id);
+      const res = await deleteCategory(category._id);
+      if (res && !res.success) {
+        alert(res.error || 'Failed to delete category');
+      }
     }
   };
 

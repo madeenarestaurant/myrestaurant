@@ -185,24 +185,7 @@ const Reservations = () => {
                                       </div>
                                   )}
 
-                                  {filter === 'Inactive' && finished && !isProcessed && (
-                                      <div className="flex items-center gap-3">
-                                          <button 
-                                              onClick={() => handleStatusUpdate(res._id, 'Completed', 'Paid')}
-                                              className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all shadow-sm"
-                                              title="Done (Completed & Paid)"
-                                          >
-                                              <FiCheck size={18} />
-                                          </button>
-                                          <button 
-                                              onClick={() => handleStatusUpdate(res._id, 'No Occasion Found')}
-                                              className="w-10 h-10 rounded-xl bg-gray-50 text-gray-500 flex items-center justify-center hover:bg-gray-500 hover:text-white transition-all shadow-sm"
-                                              title="Not Done (No Occasion Found)"
-                                          >
-                                              <FiX size={18} />
-                                          </button>
-                                      </div>
-                                  )}
+                                  {/* Inactive action buttons moved to details area */}
 
                                   <button 
                                       onClick={() => setExpandedId(expandedId === res._id ? null : res._id)}
@@ -222,31 +205,82 @@ const Reservations = () => {
                                       exit={{ height: 0, opacity: 0 }}
                                       className="overflow-hidden"
                                   >
-                                      <div className="mt-8 pt-8 border-t border-gray-50 grid grid-cols-1 md:grid-cols-3 gap-8">
-                                          <div className="space-y-3">
-                                              <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Customer Info</p>
-                                              <p className="text-xs font-bold text-gray-700">{res.fullName}</p>
-                                              <p className="text-[11px] text-gray-400 font-medium">{res.phone}</p>
-                                              <p className="text-[11px] text-gray-400 font-medium">{res.email}</p>
-                                          </div>
-                                          
-                                          <div className="space-y-3">
-                                              <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Booking Context</p>
-                                              <p className="text-xs font-bold text-gray-700">Type: <span className="font-medium">{res.reservationType}</span></p>
-                                              <p className="text-xs font-bold text-gray-700">Guests: <span className="font-medium">{res.guests}</span></p>
-                                              <p className="text-xs font-bold text-gray-700">Venue: <span className="font-medium text-[#8B3B3B]">{res.venueDetails || 'Hall'}</span></p>
+                                      <div className="mt-8 pt-8 border-t border-gray-50 flex flex-col gap-8">
+                                          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                              <div className="space-y-3">
+                                                  <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Customer Info</p>
+                                                  <p className="text-xs font-bold text-gray-700">{res.fullName}</p>
+                                                  <p className="text-[11px] text-gray-400 font-medium">{res.phone}</p>
+                                                  <p className="text-[11px] text-gray-400 font-medium">{res.email}</p>
+                                              </div>
+                                              
+                                              <div className="space-y-3">
+                                                  <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Booking Context</p>
+                                                  <p className="text-xs font-bold text-gray-700">Type: <span className="font-medium">{res.reservationType}</span></p>
+                                                  <p className="text-xs font-bold text-gray-700">Guests: <span className="font-medium">{res.guests}</span></p>
+                                                  <p className="text-xs font-bold text-gray-700">Venue: <span className="font-medium text-[#8B3B3B]">{res.venueDetails || 'Hall'}</span></p>
+                                              </div>
+
+                                              <div className="space-y-3">
+                                                  <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Requirements</p>
+                                                  <p className="text-xs text-gray-500 font-medium leading-relaxed italic">
+                                                    "{res.specialRequirements || 'No special requirements'}"
+                                                  </p>
+                                                  {res.messageToUser && (
+                                                    <div className="mt-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                                        <p className="text-[9px] font-black text-gray-400 uppercase mb-1">Message Sent</p>
+                                                        <p className="text-[10px] text-gray-600 font-medium italic">{res.messageToUser}</p>
+                                                    </div>
+                                                  )}
+                                              </div>
                                           </div>
 
-                                          <div className="space-y-3">
-                                              <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Requirements</p>
-                                              <p className="text-xs text-gray-500 font-medium leading-relaxed italic">
-                                                "{res.specialRequirements || 'No special requirements'}"
-                                              </p>
-                                              {res.messageToUser && (
-                                                <div className="mt-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                                    <p className="text-[9px] font-black text-gray-400 uppercase mb-1">Message Sent</p>
-                                                    <p className="text-[10px] text-gray-600 font-medium italic">{res.messageToUser}</p>
-                                                </div>
+                                          {/* Action Buttons */}
+                                          <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-gray-50 bg-gray-50/50 -mx-6 -mb-6 p-6 md:rounded-b-[2.5rem]">
+                                              <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest mr-auto w-full md:w-auto mb-2 md:mb-0">Update Status:</p>
+                                              
+                                              {!finished ? (
+                                                  <>
+                                                      <button 
+                                                          onClick={() => setModalData({ id: res._id, type: 'accept' })} 
+                                                          className={clsx(
+                                                              "flex-1 md:flex-none px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                                              res.status === 'Confirmed' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "bg-white border border-emerald-100 text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200"
+                                                          )}
+                                                      >
+                                                          {res.status === 'Confirmed' ? '✓ Confirmed' : 'Confirm Request'}
+                                                      </button>
+                                                      <button 
+                                                          onClick={() => setModalData({ id: res._id, type: 'reject' })} 
+                                                          className={clsx(
+                                                              "flex-1 md:flex-none px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                                              res.status === 'Rejected' ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "bg-white border border-rose-100 text-rose-600 hover:bg-rose-50 hover:border-rose-200"
+                                                          )}
+                                                      >
+                                                          {res.status === 'Rejected' ? '✓ Rejected' : 'Reject Request'}
+                                                      </button>
+                                                  </>
+                                              ) : (
+                                                  <>
+                                                      <button 
+                                                          onClick={() => handleStatusUpdate(res._id, 'Completed', 'Paid')} 
+                                                          className={clsx(
+                                                              "flex-1 md:flex-none px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                                              res.status === 'Completed' ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20" : "bg-white border border-indigo-100 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-200"
+                                                          )}
+                                                      >
+                                                          {res.status === 'Completed' ? '✓ Completed' : 'Mark Completed'}
+                                                      </button>
+                                                      <button 
+                                                          onClick={() => handleStatusUpdate(res._id, 'No Occasion Found')} 
+                                                          className={clsx(
+                                                              "flex-1 md:flex-none px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                                              res.status === 'No Occasion Found' ? "bg-gray-500 text-white shadow-lg shadow-gray-500/20" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"
+                                                          )}
+                                                      >
+                                                          {res.status === 'No Occasion Found' ? '✓ No Occasion' : 'No Occasion Found'}
+                                                      </button>
+                                                  </>
                                               )}
                                           </div>
                                       </div>

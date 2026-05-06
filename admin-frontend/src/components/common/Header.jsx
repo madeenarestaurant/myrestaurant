@@ -7,6 +7,8 @@ import { clsx } from 'clsx';
 import Cookies from 'js-cookie';
 
 
+import api from '../../api';
+
 const Header = () => {
   const { darkMode, toggleDarkMode, notifications } = useThemeStore();
   const { activeTab, setActiveTab, profile, fetchProfile, newNotification } = useAdminStore();
@@ -30,9 +32,16 @@ const Header = () => {
     setShowProfilePopup(false);
   };
 
-  const handleLogout = () => {
-    Cookies.remove('token');
-    window.location.href = '/login';
+  const handleLogout = async () => {
+    if (window.confirm("Are you sure you want to sign out?")) {
+        try {
+            await api.auth.logout();
+        } catch (err) {
+            console.error('Logout failed:', err);
+        }
+        Cookies.remove('token');
+        window.location.href = '/login';
+    }
   };
 
 

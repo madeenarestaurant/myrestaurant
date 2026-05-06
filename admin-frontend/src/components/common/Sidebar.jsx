@@ -33,14 +33,15 @@ const Sidebar = () => {
   ];
 
   const handleLogout = async () => {
-    try {
-        await api.auth.logout();
-    } catch (err) {
-        console.error('Logout failed:', err);
+    if (window.confirm("Are you sure you want to sign out?")) {
+        try {
+            await api.auth.logout();
+        } catch (err) {
+            console.error('Logout failed:', err);
+        }
+        Cookies.remove('token');
+        navigate('/login');
     }
-    Cookies.remove('token');
-    navigate('/login');
-
   };
 
   return (
