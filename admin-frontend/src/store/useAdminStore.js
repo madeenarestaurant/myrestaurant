@@ -126,7 +126,7 @@ const useAdminStore = create((set, get) => ({
   updateOrderStatus: async (id, data) => {
     try {
         await api.orders.updateStatus(id, data);
-        get().fetchStats(); // Refresh everything
+        get().fetchStats(); 
     } catch (error) {
         console.error('Error updating order status:', error);
     }
@@ -210,7 +210,7 @@ const useAdminStore = create((set, get) => ({
                 pendingOrders: state.stats.pendingOrders + 1
             }
         }));
-        // Optional: show notification
+        
         console.log('New Order Received:', order);
     });
 

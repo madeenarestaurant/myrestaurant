@@ -17,11 +17,9 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         
-        {/* Protected Admin Routes */}
         <Route 
             path="/" 
             element={
@@ -31,7 +29,6 @@ function App() {
             } 
         />
         
-        {/* Catch-all Not Found Route */}
         <Route path="/404" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/404" replace />} />
       </Routes>

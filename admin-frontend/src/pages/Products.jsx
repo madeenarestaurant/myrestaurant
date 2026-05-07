@@ -20,7 +20,7 @@ const Products = () => {
     deleteCategory
   } = useAdminStore();
 
-  const [activeMode, setActiveMode] = useState('products'); // 'products' or 'categories'
+  const [activeMode, setActiveMode] = useState('products'); 
   const [showDrawer, setShowDrawer] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -224,8 +224,8 @@ const Products = () => {
                     transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                     className={clsx(
                         "bg-white z-40 flex flex-col transition-all duration-300",
-                        "relative w-full mb-8 rounded-[2.5rem] border border-gray-100 shadow-xl", // Mobile View
-                        "lg:fixed lg:top-20 lg:right-0 lg:bottom-0 lg:w-[480px] lg:mb-0 lg:rounded-none lg:border-l lg:shadow-[-20px_0_40px_rgba(0,0,0,0.05)]" // Desktop View
+                        "relative w-full mb-8 rounded-[2.5rem] border border-gray-100 shadow-xl", 
+                        "lg:fixed lg:top-20 lg:right-0 lg:bottom-0 lg:w-[480px] lg:mb-0 lg:rounded-none lg:border-l lg:shadow-[-20px_0_40px_rgba(0,0,0,0.05)]"
                     )}
                 >
                     <div className="p-6 sm:p-10 flex justify-between items-center border-b border-gray-50 bg-gray-50/20 rounded-t-[2.5rem] lg:rounded-none">

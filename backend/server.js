@@ -17,7 +17,6 @@ const allowedOrigins = [
 ];
 
 
-// Route imports
 const adminRoutes = require('./routes/adminRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes = require('./routes/productRoutes');
@@ -28,7 +27,6 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const menuImageRoutes = require('./routes/menuImageRoutes');
 
 connectDB().then(async () => {
-  // Reset all visitors to offline on server start
   try {
     await Visitor.updateMany({}, { isOnline: false });
     console.log('All visitors reset to offline status');
@@ -63,13 +61,11 @@ app.use(cors({
 app.use(express.json());
 
 
-// Middleware to attach io to req
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
 
-// API Routes
 app.use('/api/admin', adminRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
@@ -79,7 +75,6 @@ app.use('/api/visitors', visitorRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/menu-images', menuImageRoutes);
 
-// Socket.io for Live Visitors
 io.on('connection', (socket) => {
   socket.on('visitor_connected', async (visitorId) => {
     socket.visitorId = visitorId;
@@ -100,7 +95,6 @@ io.on('connection', (socket) => {
     }
   });
   
-  // Send current count to newly connected socket (e.g. admin panel)
   Visitor.countDocuments({ isOnline: true }).then(count => {
     socket.emit('online_count', count);
   });

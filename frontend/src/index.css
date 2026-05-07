@@ -15,32 +15,27 @@
 }
 
 @layer utilities {
-  /* Inverse Rounded Corner - Bottom Left Shadow */
   .box-shadow-corner-bl {
     box-shadow: -20px -20px 0 20px #0a0a0a;
     border-bottom-left-radius: 3rem;
   }
   
-  /* Inverse Rounded Corner - Top Right Shadow */
   .box-shadow-corner-tr {
     box-shadow: 20px 20px 0 20px #0a0a0a;
     border-top-right-radius: 3rem;
   }
 
-  /* Custom serif font fallback */
   .font-serif {
     font-family: 'Playfair Display', Georgia, serif;
   }
 
-  /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
 
-  /* Hide scrollbar for IE, Edge and Firefox */
   .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
   }
 
   .brand-gradient {

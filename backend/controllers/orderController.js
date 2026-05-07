@@ -10,7 +10,6 @@ exports.createOrder = async (req, res) => {
             totalAmount, note, visitorId, mode, paymentMethod 
         } = req.body;
 
-        // Generate 4-digit token
         const token = Math.floor(1000 + Math.random() * 9000).toString();
 
         const newOrder = new Order({
@@ -20,7 +19,6 @@ exports.createOrder = async (req, res) => {
         });
         await newOrder.save();
 
-        // Link to Visitor if ID provided
         if (visitorId) {
             await Visitor.findOneAndUpdate(
                 { visitorId },
@@ -28,7 +26,6 @@ exports.createOrder = async (req, res) => {
             );
         }
         
-        // Create Notification
         const notification = new Notification({
             type: 'order',
             message: `New order from ${customerName || 'Customer'} - Token: ${token}`,
@@ -36,19 +33,16 @@ exports.createOrder = async (req, res) => {
         });
         await notification.save();
 
-        // Populate for socket emission
         const populatedOrder = await Order.findById(newOrder._id).populate({
             path: 'items.product',
             populate: { path: 'category' }
         });
 
-        // Emit socket events
         if (req.io) {
             req.io.emit('new_order', populatedOrder);
             req.io.emit('new_notification', notification);
         }
 
-        // Send confirmation email to user
         if (email) {
             const subject = 'Order Received - Madeena Restaurant';
             

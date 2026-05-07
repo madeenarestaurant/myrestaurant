@@ -9,7 +9,6 @@ const authMiddleware = async (req, res, next) => {
             return res.status(401).json({ message: 'No authentication token, authorization denied' });
         }
 
-        // Check if token is blacklisted
         const isBlacklisted = await Blacklist.findOne({ token });
         if (isBlacklisted) {
             return res.status(401).json({ message: 'Token is invalid (blacklisted). Please login again.' });

@@ -10,7 +10,6 @@ router.post('/logout', auth, adminController.logoutAdmin);
 router.get('/profile', auth, adminController.getAdminProfile);
 router.put('/profile', auth, upload.single('profileimg'), adminController.updateAdminProfile);
 
-// Password Reset Routes
 router.post('/send-otp', adminController.sendAdminOtp);
 router.post('/reset-password', adminController.resetAdminPassword);
 

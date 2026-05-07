@@ -11,17 +11,7 @@ const getS3Client = () => {
     });
 };
 
-/**
- * Lists all objects in the S3 bucket under the res-files folder,
- * generates signed URLs for each, and returns a map:
- * { "PIZZA": "https://signed-url...", "BURGER": "...", ... }
- *
- * The key used in the map is the base filename stripped of:
- *  - folder prefix (res-files/)
- *  - timestamp prefix (e.g., "1714567890123-")
- *  - file extension (.jpeg, .jpg, .png, .webp)
- * all converted to UPPERCASE for easy matching.
- */
+
 exports.getMenuImages = async (req, res) => {
     try {
         const s3 = getS3Client();
@@ -31,7 +21,6 @@ exports.getMenuImages = async (req, res) => {
         const imageMap = {};
         let continuationToken = undefined;
 
-        // Paginate through all objects
         do {
             const listCommand = new ListObjectsV2Command({
                 Bucket: bucket,
@@ -42,26 +31,19 @@ exports.getMenuImages = async (req, res) => {
             const listResponse = await s3.send(listCommand);
             const objects = listResponse.Contents || [];
 
-            // Generate signed URLs in parallel
             await Promise.all(objects.map(async (obj) => {
                 const key = obj.Key;
 
-                // Skip folder-level entries
                 if (key.endsWith('/')) return;
 
-                // Extract the base filename without folder prefix
                 let filename = key.replace(`${folder}/`, '');
 
-                // Strip optional timestamp prefix: digits followed by "-"
                 filename = filename.replace(/^\d+-/, '');
 
-                // Strip file extension
                 const nameWithoutExt = filename.replace(/\.(jpeg|jpg|png|webp)$/i, '');
 
-                // Normalise to uppercase for matching (menu items use uppercase keys)
                 const mapKey = nameWithoutExt.toUpperCase();
 
-                // Generate a signed URL (expires in 4 hours)
                 const getCommand = new GetObjectCommand({ Bucket: bucket, Key: key });
                 const signedUrl = await getSignedUrl(s3, getCommand, { expiresIn: 14400 });
 

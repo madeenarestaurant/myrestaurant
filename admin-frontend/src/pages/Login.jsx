@@ -26,7 +26,7 @@ const Login = () => {
     setError('');
     try {
       const { data } = await api.auth.login({ email, password });
-      Cookies.set('token', data.token, { expires: 7 }); // Expires in 7 days
+      Cookies.set('token', data.token, { expires: 7 });  
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid credentials');

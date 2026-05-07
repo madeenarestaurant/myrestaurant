@@ -3,8 +3,6 @@ import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import { menuImageApi } from "../services/api";
 
-// imageMap is fetched from backend as: { "PIZZA": "https://signed-url...", ... }
-// Keys are uppercase, trimmed. Lookup is done case-insensitively.
 
 const menuData = [
   {
@@ -71,7 +69,7 @@ const menuData = [
     ]
   },
   {
-    category: "Meals with Rice & 1 Skewer", type: "list", footerKey: "MEALS-WITH-RICE-&-1-SKEWER",
+    category: "Meals with Rice & 1 Skewer", type: "list", footerKey: "Meals with Rice & 1 Skewer",
     items: [
       { name: "Kabab Chicken", price: "3.045 OMR" },
       { name: "Joojeh Tikka", price: "3.255 OMR" },
@@ -85,7 +83,7 @@ const menuData = [
     ]
   },
   {
-    category: "Meal with Tandoori Bread 1 Skewer", type: "list", footerKey: "MEAL-WITH-TANDOORI-BREAD-1-SKEWER",
+    category: "Meal with Tandoori Bread 1 Skewer", type: "list", footerKey: "Meal with Tandoori Bread 1 Skewer",
     items: [
       { name: "Joojeh Tikka", price: "3.570 OMR" },
       { name: "Chicken Yoghurt", price: "3.465 OMR" },
@@ -98,7 +96,7 @@ const menuData = [
     ]
   },
   {
-    category: "Grilled Sandwiches", type: "sandwiches", footerKey: "GRILLED-SANDWICHES",
+    category: "Grilled Sandwiches", type: "sandwiches", footerKey: "Grilled Sandwiches",
     items: [
       { name: "Kabab Lamb" },
       { name: "Tandoori Chicken" },
@@ -109,7 +107,7 @@ const menuData = [
     ]
   },
   {
-    category: "Grilled Burgers", type: "burgers", footerKey: "GRILLED-BURGERS",
+    category: "Grilled Burgers", type: "burgers", footerKey: "Grilled Burgers",
     items: [
       { name: "Grilled Lamb Burger\nwith fries and drink", price: "2.100\nOMR", burgerOnly: "1.785\nOMR" },
       { name: "Grilled Chicken Burger\nwith fries and drink", price: "1.785\nOMR", burgerOnly: "1.680\nOMR" },
@@ -331,7 +329,6 @@ const Menu = () => {
   const [imageMap, setImageMap] = useState(cached || {});
   const [imagesLoading, setImagesLoading] = useState(!cached);
 
-  // Lookup helper: normalise imageKey to uppercase and search the map
   const getImage = (key) => {
     if (!key || !imageMap) return null;
     const upperKey = key.trim().toUpperCase();
@@ -348,12 +345,7 @@ const Menu = () => {
   }, []);
 
   return (
-    // Premium elegant dark-slate grey outer background theme
     <div className="bg-[#2a2a2d] text-white font-sans selection:bg-[#8C231F] selection:text-white pb-24">
-
-      {/* 
-        Hero Section: Majestic Full Screen Height
-      */}
       <div className="relative w-full h-[70vh] md:h-[85vh] p-4 md:p-6 lg:p-8">
         <div className="relative w-full h-full rounded-[2.5rem] overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-[#4a4a50] bg-black">
           <Navbar transparent={true} />
@@ -400,7 +392,6 @@ const Menu = () => {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8 }}
             key={sIndex}
-            // Rich inner card background
             className="bg-[#38383c] rounded-[2rem] p-5 lg:p-10 shadow-[0_10px_30px_rgba(0,0,0,0.4)] border border-[#4a4a50] relative"
           >
             {/* Soft Transparent Pattern Background */}

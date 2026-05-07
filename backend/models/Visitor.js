@@ -14,7 +14,7 @@ const visitorSchema = new mongoose.Schema({
   pagesVisited: [{
     path: String,
     timestamp: { type: Date, default: Date.now },
-    timeSpent: { type: Number, default: 0 } // in seconds
+    timeSpent: { type: Number, default: 0 } 
   }],
   clicks: [{
     path: String,
@@ -32,7 +32,6 @@ const visitorSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
-// Index for faster lookups
 visitorSchema.index({ visitorId: 1 });
 visitorSchema.index({ ip: 1 });
 

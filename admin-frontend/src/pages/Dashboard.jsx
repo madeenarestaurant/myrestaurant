@@ -15,7 +15,7 @@ import {
 import useAdminStore from '../store/useAdminStore';
 import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
-import { format } from 'date-fns'; // re-scan
+import { format } from 'date-fns';  
 
 const Dashboard = () => {
   const { stats, recentOrders, reservations, visitors, fetchStats, fetchVisitors, loading, setActiveTab } = useAdminStore();
@@ -27,7 +27,6 @@ const Dashboard = () => {
 
   const formatCurrency = (val) => `₹${val?.toLocaleString()}`;
 
-  // Calculate today's orders and reservations
   const today = new Date().toDateString();
   const todayOrders = (recentOrders || []).filter(o => new Date(o.createdAt).toDateString() === today);
   const todayReservations = (reservations || []).filter(r => new Date(r.createdAt).toDateString() === today);

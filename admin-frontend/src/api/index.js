@@ -1,7 +1,6 @@
 import axiosInstance from './axiosInstance';
 
 const api = {
-    // Authentication & Profile
     auth: {
         login: (credentials) => axiosInstance.post('/admin/login', credentials),
         register: (data) => axiosInstance.post('/admin/register', data),
@@ -15,12 +14,10 @@ const api = {
         logout: () => axiosInstance.post('/admin/logout'),
     },
 
-    // Dashboard & Stats
     stats: {
         getOverview: () => axiosInstance.get('/visitors/stats'),
     },
 
-    // Product Management
     products: {
         getAll: () => axiosInstance.get('/products'),
         create: (data) => axiosInstance.post('/products', data, {
@@ -32,7 +29,6 @@ const api = {
         delete: (id) => axiosInstance.delete(`/products/${id}`),
     },
 
-    // Category Management
     categories: {
         getAll: () => axiosInstance.get('/categories'),
         create: (data) => axiosInstance.post('/categories', data, {
@@ -44,28 +40,24 @@ const api = {
         delete: (id) => axiosInstance.delete(`/categories/${id}`),
     },
 
-    // Order Management
     orders: {
         getAll: () => axiosInstance.get('/orders'),
         updateStatus: (id, statusData) => axiosInstance.put(`/orders/${id}`, statusData),
         delete: (id) => axiosInstance.delete(`/orders/${id}`),
     },
 
-    // Reservation Management
     reservations: {
         getAll: () => axiosInstance.get('/reservations'),
         update: (id, data) => axiosInstance.put(`/reservations/${id}`, data),
         delete: (id) => axiosInstance.delete(`/reservations/${id}`),
     },
 
-    // Notification Management
     notifications: {
         getAll: () => axiosInstance.get('/notifications'),
         delete: (id) => axiosInstance.delete(`/notifications/${id}`),
         clearAll: () => axiosInstance.delete('/notifications'),
     },
 
-    // Visitor Tracking & Analysis
     visitors: {
         getAll: () => axiosInstance.get('/visitors'),
     }

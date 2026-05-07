@@ -80,7 +80,7 @@ exports.updateAdminProfile = async (req, res) => {
     try {
         const updates = req.body;
         if (req.file) {
-            updates.profileimg = req.file.location; // S3 URL
+            updates.profileimg = req.file.location; 
         }
         const admin = await Admin.findByIdAndUpdate(req.adminId, updates, { new: true }).select('-password');
         res.json(admin);

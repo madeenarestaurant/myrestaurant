@@ -21,7 +21,7 @@ const fadeUp = {
 };
 
 const Reservations = () => {
-  const [step, setStep] = useState(0); // 0=type, 1=contacts, 2=event, 3=success
+  const [step, setStep] = useState(0); 
   const [type, setType] = useState("");
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
@@ -46,7 +46,6 @@ const Reservations = () => {
     setTimeout(() => setToast(null), 4500);
   };
 
-  // Fetch occupied slots whenever date changes
   useEffect(() => {
     const dateStr = form.eventDate.toISOString().split("T")[0];
     reservationApi.getOccupiedSlots(dateStr)
@@ -100,12 +99,10 @@ const Reservations = () => {
     if (!form.guests || form.guests < 1) return notify("Enter number of guests.", true);
     if (!form.startTime || !form.endTime) return notify("Select start and end time.", true);
     
-    // Time sequence validation
     if (form.startTime >= form.endTime) {
       return notify("End time must be after start time.", true);
     }
 
-    // Current time validation (if date is today)
     const today = new Date().toISOString().split("T")[0];
     const selectedDate = form.eventDate.toISOString().split("T")[0];
     if (selectedDate === today) {
@@ -116,7 +113,6 @@ const Reservations = () => {
       }
     }
 
-    // Overlap validation
     const hasOverlap = occupiedSlots.some(slot => {
       return (form.startTime < slot.endTime) && (slot.startTime < form.endTime);
     });
@@ -139,7 +135,6 @@ const Reservations = () => {
     } finally { setLoading(false); }
   };
 
-  // Build a human-readable occupied time summary for display
   const occupiedSummary = occupiedSlots.length
     ? occupiedSlots.map((s) => `${to12Hour(s.startTime)} – ${to12Hour(s.endTime)}`).join(", ")
     : null;
@@ -151,7 +146,6 @@ const Reservations = () => {
   return (
     <div className="min-h-screen bg-[#070707] text-white font-sans overflow-x-hidden">
 
-      {/* ── Hero ── */}
       <div className="relative w-full h-[75vh] md:h-[90vh] p-4 md:p-6">
         <div className="relative w-full h-full rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl">
           <Navbar transparent={true} />

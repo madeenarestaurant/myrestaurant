@@ -44,7 +44,6 @@ const AnalyticsChart = ({ orders = [], reservations = [], visitors = [] }) => {
     const now = new Date();
 
     if (period === 'daily') {
-      // Last 7 days — one bar per day
       const days = Array.from({ length: 7 }, (_, i) => subDays(now, 6 - i));
       return days.map((day) => {
         const label = format(day, 'EEE');
@@ -59,7 +58,6 @@ const AnalyticsChart = ({ orders = [], reservations = [], visitors = [] }) => {
     }
 
     if (period === 'monthly') {
-      // Last 6 months — one point per month week groups
       const months = Array.from({ length: 6 }, (_, i) => subMonths(now, 5 - i));
       return months.map((month) => {
         const label = format(month, 'MMM');
@@ -74,7 +72,6 @@ const AnalyticsChart = ({ orders = [], reservations = [], visitors = [] }) => {
     }
 
     if (period === 'yearly') {
-      // Last 12 months — one point per month
       const months = Array.from({ length: 12 }, (_, i) => subMonths(now, 11 - i));
       return months.map((month) => {
         const label = format(month, 'MMM yy');

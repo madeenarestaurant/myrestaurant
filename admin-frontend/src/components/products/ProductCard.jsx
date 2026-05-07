@@ -21,7 +21,6 @@ const ProductCard = ({ product, onEdit }) => {
   const toggleAvailability = async (e) => {
     e.stopPropagation();
     const newStatus = isAvailable ? 'out of stock' : 'available';
-    // We send as FormData because updateProduct might expect it for image handling too
     const data = new FormData();
     data.append('status', newStatus);
     await updateProduct(product._id, data);

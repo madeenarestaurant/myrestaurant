@@ -9,7 +9,7 @@ const Profile = () => {
   const { profile, updateProfile, fetchProfile } = useAdminStore();
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ message: '', type: 'success' });
-  const [editingId, setEditingId] = useState(null); // 'personal' or 'business'
+  const [editingId, setEditingId] = useState(null); 
   
   const [formData, setFormData] = useState({
     name: '',
@@ -48,7 +48,7 @@ const Profile = () => {
         img.src = event.target.result;
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 800; // Optimal for profile pics
+          const MAX_WIDTH = 800; 
           const scaleSize = MAX_WIDTH / img.width;
           canvas.width = MAX_WIDTH;
           canvas.height = img.height * scaleSize;
@@ -58,7 +58,7 @@ const Profile = () => {
           
           canvas.toBlob((blob) => {
             resolve(new File([blob], file.name, { type: 'image/jpeg' }));
-          }, 'image/jpeg', 0.8); // 80% quality is perfect balance
+          }, 'image/jpeg', 0.8); 
         };
       };
     });

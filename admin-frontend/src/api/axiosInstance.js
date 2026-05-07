@@ -11,7 +11,6 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// Add a request interceptor to add the auth token to headers
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = Cookies.get('token');
@@ -26,12 +25,10 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Add a response interceptor to handle authentication errors
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Trigger session expired UI instead of immediate redirect
       Cookies.remove('token');
       useAdminStore.getState().setSessionExpired(true);
     }

@@ -11,7 +11,6 @@ exports.createProduct = async (req, res) => {
         });
         await newProduct.save();
         
-        // Generate signed URL for response
         const productObj = newProduct.toObject();
         productObj.img = await generateSignedUrl(productObj.img);
         
@@ -26,7 +25,6 @@ exports.getProducts = async (req, res) => {
     try {
         const products = await Product.find().populate('category');
         
-        // Generate signed URLs for all products
         const productsWithSignedUrls = await Promise.all(products.map(async (p) => {
             const obj = p.toObject();
             obj.img = await generateSignedUrl(obj.img);

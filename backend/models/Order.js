@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const OrderSchema = new mongoose.Schema({
-    customerName: { type: String }, // Optional for dine-in
+    customerName: { type: String }, 
     email: { type: String },
     phone: { type: String },
     addressDetails: {
@@ -11,7 +11,7 @@ const OrderSchema = new mongoose.Schema({
         street: String,
         nearby: String
     },
-    address: { type: String }, // Consolidated address string
+    address: { type: String }, 
     items: [{
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
         quantity: { type: Number, default: 1 },

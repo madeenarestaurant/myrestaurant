@@ -19,14 +19,14 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import Toast from '../components/common/Toast';
 import { clsx } from 'clsx';
-import { format, isPast, parseISO } from 'date-fns'; // triggered re-scan
+import { format, isPast, parseISO } from 'date-fns'; 
 
 const Reservations = () => {
   const { reservations, fetchStats, loading, stats } = useAdminStore();
   const [filter, setFilter] = useState('Active');
   const [toast, setToast] = useState({ message: '', type: 'success' });
   const [expandedId, setExpandedId] = useState(null);
-  const [modalData, setModalData] = useState(null); // { id, type }
+  const [modalData, setModalData] = useState(null); 
   const [message, setMessage] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 

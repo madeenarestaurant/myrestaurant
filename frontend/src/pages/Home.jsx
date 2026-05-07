@@ -13,7 +13,6 @@ const menuImg = getAssetUrl("menu.jpeg");
 const orderImg = getAssetUrl("img1.jpeg");
 
 
-// Inline SVG Icons for social section (keeping them here as they are local to Home)
 const Icons = {
   Instagram: () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
@@ -52,13 +51,11 @@ const Home = () => {
 
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 z-10 pointer-events-none" />
 
-            {/* Social Icons Overlay (Bottom Right Corner) */}
             <div className="absolute bottom-2 right-6 z-30 flex items-center gap-4">
               <SocialIcon Icon={Icons.Instagram} link="https://www.instagram.com/madeena_restaurant_oman/" />
               <SocialIcon Icon={Icons.Facebook} link="https://www.facebook.com/p/Madeena-Restaurants-Oman-61586056372173/" />
             </div>
 
-            {/* Catchphrase Overlay */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}

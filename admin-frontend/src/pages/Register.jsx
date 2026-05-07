@@ -7,7 +7,7 @@ import Toast from '../components/common/Toast';
 
 const Register = () => {
     const navigate = useNavigate();
-    const [step, setStep] = useState(1); // 1: Info, 2: OTP, 3: New Password
+    const [step, setStep] = useState(1); 
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -24,7 +24,7 @@ const Register = () => {
     };
 
     const validatePassword = (password) => {
-        // Alphabet, numeric and a symbol
+       
         const hasAlpha = /[a-zA-Z]/.test(password);
         const hasNumber = /[0-9]/.test(password);
         const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);

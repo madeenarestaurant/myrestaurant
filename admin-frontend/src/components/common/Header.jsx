@@ -48,7 +48,6 @@ const Header = () => {
   return (
     <header className="h-16 md:h-20 flex items-center px-6 md:px-10 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40">
       <div className="flex items-center justify-between w-full">
-        {/* Logo Section */}
         <div className="flex items-center group cursor-pointer" onClick={() => setActiveTab('dashboard')}>
             <img 
                 src="https://madeena-res-bucket.s3.us-east-1.amazonaws.com/res-files/titlename.jpeg" 
@@ -57,7 +56,6 @@ const Header = () => {
             />
         </div>
 
-        {/* Right Side Icons */}
         <div className="flex items-center gap-4 md:gap-8">
             <button 
                 onClick={() => setActiveTab('notifications')}
@@ -90,7 +88,6 @@ const Header = () => {
                     )}
                 </button>
 
-                {/* Profile Quick-view Popup */}
                 <AnimatePresence>
                     {showProfilePopup && (
                         <motion.div 
@@ -161,7 +158,6 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Real-time Notification Toast */}
       <AnimatePresence>
         {newNotification && (
           <motion.div

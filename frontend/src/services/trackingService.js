@@ -45,13 +45,11 @@ class TrackingService {
     try {
       const userAgent = navigator.userAgent;
       
-      // Try to get external IP for better geolocation in dev environments
       let externalIp = null;
       try {
         const ipRes = await axios.get('https://api.ipify.org?format=json', { timeout: 2000 });
         externalIp = ipRes.data.ip;
       } catch (e) {
-        // Ignore IP fetch failure
       }
 
       await axios.post(`${API_URL}/track`, {
@@ -81,7 +79,6 @@ class TrackingService {
           element
         });
       } catch (error) {
-        // Silent error for tracking
       }
     });
   }
@@ -91,7 +88,6 @@ class TrackingService {
       this.sendTimeSpent();
     });
 
-    // Also track on path change (for SPA)
     let lastUrl = window.location.href;
     new MutationObserver(() => {
       const url = window.location.href;
@@ -109,7 +105,6 @@ class TrackingService {
     const timeSpent = Math.floor((Date.now() - this.startTime) / 1000);
     if (timeSpent > 0) {
       try {
-        // Use beacon API if available for more reliable delivery on unload
         const data = JSON.stringify({
           visitorId: this.visitorId,
           path: this.currentPath,
@@ -126,7 +121,6 @@ class TrackingService {
           });
         }
       } catch (error) {
-        // Silent error
       }
     }
   }

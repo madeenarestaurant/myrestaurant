@@ -8,11 +8,9 @@ const trackVisitor = async (req, res) => {
     const { visitorId, path, userAgent, externalIp } = req.body;
     let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     
-    // Clean up IP
     if (ip.includes(',')) ip = ip.split(',')[0].trim();
     if (ip === '::1' || ip === '127.0.0.1' || ip.startsWith('::ffff:127.0.0.1')) {
-       // Use client-side detected IP if available in dev environment
-       ip = externalIp || '103.117.159.0'; // Fallback to a generic India IP if everything fails in dev
+       ip = externalIp || '103.117.159.0'; 
     }
 
     const parser = new UAParser(userAgent);
@@ -20,7 +18,6 @@ const trackVisitor = async (req, res) => {
 
     let visitor = await Visitor.findOne({ visitorId });
 
-    // Extract device details
     const deviceInfo = {
       userAgent,
       device: result.device.type || "desktop",
@@ -31,7 +28,6 @@ const trackVisitor = async (req, res) => {
     };
 
     if (!visitor) {
-      // Fetch Geo Data
       let geoData = {
         country: 'India',
         city: 'Unknown',
@@ -60,14 +56,11 @@ const trackVisitor = async (req, res) => {
         visitCount: 1
       });
     } else {
-      // Update existing visitor with latest info
       visitor.visitCount += 1;
       visitor.pagesVisited.push({ path });
       
-      // Update device info in case they switched or updated browser
       Object.assign(visitor, deviceInfo);
 
-      // Refresh geo data if IP changed significantly or missing
       if (visitor.ip !== ip || !visitor.country) {
         try {
           const response = await axios.get(`http://ip-api.com/json/${ip}`, { timeout: 3000 });
@@ -95,7 +88,6 @@ const updateTimeSpent = async (req, res) => {
     const visitor = await Visitor.findOne({ visitorId });
     
     if (visitor) {
-      // Find the last visit to this path and update timeSpent
       const lastPageVisit = [...visitor.pagesVisited].reverse().find(p => p.path === path);
       if (lastPageVisit) {
         lastPageVisit.timeSpent += timeSpent;

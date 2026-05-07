@@ -16,7 +16,7 @@ const Cart = () => {
         const saved = sessionStorage.getItem('cart');
         return saved ? JSON.parse(saved) : {};
     });
-    const [mode, setMode] = useState(null); // Default to null to hide form
+    const [mode, setMode] = useState(null);
     const [note, setNote] = useState('');
     const [customerInfo, setCustomerInfo] = useState({
         customerName: '',
@@ -30,7 +30,7 @@ const Cart = () => {
     });
     const [showConfirm, setShowConfirm] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [orderData, setOrderData] = useState(null); // Stores created order info
+    const [orderData, setOrderData] = useState(null); 
 
     const cartItems = Object.values(cart);
     const cartTotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -163,7 +163,6 @@ const Cart = () => {
         <div className="min-h-screen bg-[#0a0a0a] text-white font-outfit selection:bg-[#8C231F]">
             <div className="max-w-[1240px] mx-auto px-6 pt-12 pb-20">
                 
-                {/* Header */}
                 <div className="flex items-center gap-4 mb-10 border-b border-white/5 pb-6">
                     <button onClick={() => navigate('/order')} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#8C231F]/20 transition-all group">
                         <ChevronLeft size={18} className="group-hover:-translate-x-0.5 transition-transform" />

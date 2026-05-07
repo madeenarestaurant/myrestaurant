@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiBell, FiTrash2, FiCheck, FiX, FiClock, FiShoppingBag, FiCalendar, FiAlertCircle } from 'react-icons/fi';
 import useAdminStore from '../store/useAdminStore';
 import { clsx } from 'clsx';
-import { format } from 'date-fns'; // date-fns is installed, please restart dev server if error persists
+import { format } from 'date-fns'; 
 
 const Notifications = () => {
     const { setActiveTab } = useAdminStore();

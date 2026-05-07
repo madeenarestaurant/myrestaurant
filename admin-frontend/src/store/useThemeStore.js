@@ -18,7 +18,7 @@ const useThemeStore = create(
       }),
       setNotifications: (val) => set({ notifications: val }),
       setShowDetails: (val) => set({ showDetails: val }),
-      // Function to sync theme on load
+      
       syncTheme: () => set((state) => {
         if (state.darkMode) {
           document.documentElement.setAttribute('data-theme', 'dark');

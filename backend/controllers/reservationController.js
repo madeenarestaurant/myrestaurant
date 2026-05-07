@@ -4,7 +4,6 @@ const Otp = require('../models/Otp');
 const Notification = require('../models/Notification');
 const nodemailer = require('nodemailer');
 
-// Initialize NodeMailer
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -13,7 +12,6 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// @route   POST /api/reservations/send-otp
 exports.sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
@@ -53,7 +51,6 @@ exports.sendOtp = async (req, res) => {
   }
 };
 
-// @route   POST /api/reservations/verify-otp
 exports.verifyOtp = async (req, res) => {
   try {
     const { email, otp, visitorId } = req.body;
@@ -67,7 +64,6 @@ exports.verifyOtp = async (req, res) => {
     existingOtp.isVerified = true;
     await existingOtp.save();
 
-    // Mark visitor as email verified
     if (visitorId) {
         await Visitor.findOneAndUpdate({ visitorId }, { emailVerified: true });
     }
@@ -78,7 +74,6 @@ exports.verifyOtp = async (req, res) => {
   }
 };
 
-// @route   POST /api/reservations/book
 exports.createReservation = async (req, res) => {
   try {
     const { 
@@ -86,17 +81,14 @@ exports.createReservation = async (req, res) => {
         guests, reservationType, type, venueDetails, specialRequirements, visitorId 
     } = req.body;
 
-    // Support both 'reservationType' and 'type' for compatibility
     let finalType = reservationType || type;
-    if (finalType === 'Party') finalType = 'Normal Party'; // Align with enum
+    if (finalType === 'Party') finalType = 'Normal Party'; 
 
-    // Enforce OTP Email verification
     const verifiedOtp = await Otp.findOne({ email, isVerified: true });
     if (!verifiedOtp) {
       return res.status(400).json({ message: 'Email is not verified.' });
     }
 
-    // Check for overlaps with existing active reservations
     const overlapping = await Reservation.findOne({
       eventDate,
       status: { $ne: 'Cancelled' },
@@ -122,7 +114,6 @@ exports.createReservation = async (req, res) => {
 
     await newReservation.save();
 
-    // Link to Visitor if ID provided
     if (visitorId) {
         await Visitor.findOneAndUpdate(
             { visitorId },
@@ -130,7 +121,6 @@ exports.createReservation = async (req, res) => {
         );
     }
 
-    // Create Notification
     const notification = new Notification({
         type: 'reservation',
         message: `New reservation request from ${fullName}`,
@@ -138,13 +128,11 @@ exports.createReservation = async (req, res) => {
     });
     await notification.save();
 
-    // Emit socket event for real-time update
     if (req.io) {
         req.io.emit('new_reservation', newReservation);
         req.io.emit('new_notification', notification);
     }
 
-    // Notify user that request is received
     const userMailOptions = {
         from: `"Madeena Restaurant" <${process.env.EMAIL_USER}>`,
         to: email,
@@ -169,7 +157,6 @@ exports.createReservation = async (req, res) => {
   }
 };
 
-// @route   GET /api/reservations
 exports.getAllReservations = async (req, res) => {
     try {
         const reservations = await Reservation.find().sort({ createdAt: -1 });
@@ -179,7 +166,6 @@ exports.getAllReservations = async (req, res) => {
     }
 };
 
-// @route   GET /api/reservations/:id
 exports.getReservationById = async (req, res) => {
     try {
         const reservation = await Reservation.findById(req.params.id);
@@ -190,7 +176,6 @@ exports.getReservationById = async (req, res) => {
     }
 };
 
-// @route   PUT /api/reservations/:id
 exports.updateReservation = async (req, res) => {
     try {
         const { status, messageToUser, totalPrice, paymentStatus } = req.body;
@@ -215,7 +200,6 @@ exports.updateReservation = async (req, res) => {
             </div>
         `;
 
-        // If status changed to Confirmed, send acceptance email
         if (oldStatus !== 'Confirmed' && status === 'Confirmed') {
             const acceptanceMailOptions = {
                 from: `"Madeena Restaurant" <${process.env.EMAIL_USER}>`,
@@ -240,7 +224,6 @@ exports.updateReservation = async (req, res) => {
             }
         }
 
-        // If status changed to Rejected, send rejection email
         if (oldStatus !== 'Rejected' && status === 'Rejected') {
             const rejectionMailOptions = {
                 from: `"Madeena Restaurant" <${process.env.EMAIL_USER}>`,
@@ -267,7 +250,6 @@ exports.updateReservation = async (req, res) => {
     }
 };
 
-// @route   DELETE /api/reservations/:id
 exports.deleteReservation = async (req, res) => {
     try {
         const reservation = await Reservation.findByIdAndDelete(req.params.id);

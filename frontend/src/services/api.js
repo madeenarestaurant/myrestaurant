@@ -8,7 +8,6 @@ const api = axios.create({
   },
 });
 
-// Reservation specific API calls
 export const reservationApi = {
   sendOtp: (email) => api.post('/reservations/send-otp', { email }),
   verifyOtp: (email, otp, visitorId) => api.post('/reservations/verify-otp', { email, otp, visitorId }),
@@ -31,7 +30,7 @@ export const orderApi = {
 
 let imageCache = null;
 let cacheTime = 0;
-const CACHE_TTL = 60 * 60 * 1000; // 1 hour
+const CACHE_TTL = 60 * 60 * 1000; 
 
 export const menuImageApi = {
   getCache: () => imageCache,
